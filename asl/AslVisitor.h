@@ -1,5 +1,5 @@
 
-// Generated from Asl.g4 by ANTLR 4.7.2
+// Generated from Asl.g4 by ANTLR 4.9.2
 
 #pragma once
 
@@ -23,17 +23,27 @@ public:
 
     virtual antlrcpp::Any visitFunction(AslParser::FunctionContext *context) = 0;
 
+    virtual antlrcpp::Any visitParameters(AslParser::ParametersContext *context) = 0;
+
+    virtual antlrcpp::Any visitReturnvalue(AslParser::ReturnvalueContext *context) = 0;
+
     virtual antlrcpp::Any visitDeclarations(AslParser::DeclarationsContext *context) = 0;
 
     virtual antlrcpp::Any visitVariable_decl(AslParser::Variable_declContext *context) = 0;
 
     virtual antlrcpp::Any visitType(AslParser::TypeContext *context) = 0;
 
+    virtual antlrcpp::Any visitParamexp(AslParser::ParamexpContext *context) = 0;
+
     virtual antlrcpp::Any visitStatements(AslParser::StatementsContext *context) = 0;
+
+    virtual antlrcpp::Any visitStatementselse(AslParser::StatementselseContext *context) = 0;
 
     virtual antlrcpp::Any visitAssignStmt(AslParser::AssignStmtContext *context) = 0;
 
     virtual antlrcpp::Any visitIfStmt(AslParser::IfStmtContext *context) = 0;
+
+    virtual antlrcpp::Any visitWhileStmt(AslParser::WhileStmtContext *context) = 0;
 
     virtual antlrcpp::Any visitProcCall(AslParser::ProcCallContext *context) = 0;
 
@@ -54,6 +64,8 @@ public:
     virtual antlrcpp::Any visitRelational(AslParser::RelationalContext *context) = 0;
 
     virtual antlrcpp::Any visitUnary(AslParser::UnaryContext *context) = 0;
+
+    virtual antlrcpp::Any visitFuncCall(AslParser::FuncCallContext *context) = 0;
 
     virtual antlrcpp::Any visitValue(AslParser::ValueContext *context) = 0;
 
