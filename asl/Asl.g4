@@ -91,7 +91,8 @@ expr    : '(' expr ')'                              # relational
         | expr op=(LET|LEQ|EQUAL|NEQ|GET|GEQ) expr  # relational
         | expr AND expr                             # boolean
         | expr OR expr                              # boolean
-        | INTVAL                                    # value
+        | (INTVAL | FLOATNUM)                       # value
+        | CHAREXPR                                  # value
         | ident                                     # exprIdent
         ;
 
@@ -134,6 +135,8 @@ READ      : 'read' ;
 WRITE     : 'write' ;
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
 INTVAL    : ('0'..'9')+ ;
+FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')*;
+CHAREXPR  : '\'' ('a'..'z'|'A'..'Z') '\'';
 
 // Strings (in quotes) with escape sequences
 STRING    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ;

@@ -17,7 +17,8 @@ public:
     GEQ = 15, NOT = 16, AND = 17, OR = 18, PLUS = 19, MINUS = 20, MUL = 21, 
     DIV = 22, VAR = 23, INT = 24, FLOAT = 25, CHAR = 26, BOOL = 27, IF = 28, 
     THEN = 29, ELSE = 30, ENDIF = 31, FUNC = 32, ENDFUNC = 33, READ = 34, 
-    WRITE = 35, ID = 36, INTVAL = 37, STRING = 38, COMMENT = 39, WS = 40
+    WRITE = 35, ID = 36, INTVAL = 37, FLOATNUM = 38, CHAREXPR = 39, STRING = 40, 
+    COMMENT = 41, WS = 42
   };
 
   enum {
@@ -316,6 +317,8 @@ public:
     ValueContext(ExprContext *ctx);
 
     antlr4::tree::TerminalNode *INTVAL();
+    antlr4::tree::TerminalNode *FLOATNUM();
+    antlr4::tree::TerminalNode *CHAREXPR();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
