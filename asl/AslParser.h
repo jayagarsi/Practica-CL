@@ -1,5 +1,5 @@
 
-// Generated from Asl.g4 by ANTLR 4.9.2
+// Generated from Asl.g4 by ANTLR 4.7.2
 
 #pragma once
 
@@ -13,12 +13,12 @@ class  AslParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    ASSIGN = 8, ARRAY = 9, EQUAL = 10, NEQ = 11, LET = 12, LEQ = 13, GET = 14, 
-    GEQ = 15, NOT = 16, AND = 17, OR = 18, PLUS = 19, MINUS = 20, MUL = 21, 
-    DIV = 22, VAR = 23, INT = 24, FLOAT = 25, CHAR = 26, BOOL = 27, IF = 28, 
-    THEN = 29, ELSE = 30, ENDIF = 31, FUNC = 32, ENDFUNC = 33, READ = 34, 
-    WRITE = 35, ID = 36, INTVAL = 37, FLOATNUM = 38, CHAREXPR = 39, STRING = 40, 
-    COMMENT = 41, WS = 42
+    T__7 = 8, ASSIGN = 9, ARRAY = 10, EQUAL = 11, NEQ = 12, LET = 13, LEQ = 14, 
+    GET = 15, GEQ = 16, NOT = 17, AND = 18, OR = 19, PLUS = 20, MINUS = 21, 
+    MUL = 22, DIV = 23, VAR = 24, INT = 25, FLOAT = 26, CHAR = 27, BOOL = 28, 
+    IF = 29, THEN = 30, ELSE = 31, ENDIF = 32, FUNC = 33, ENDFUNC = 34, 
+    READ = 35, WRITE = 36, ID = 37, INTVAL = 38, FLOATNUM = 39, CHAREXPR = 40, 
+    STRING = 41, COMMENT = 42, WS = 43
   };
 
   enum {
@@ -27,7 +27,7 @@ public:
     RuleExpr = 8, RuleIdent = 9
   };
 
-  explicit AslParser(antlr4::TokenStream *input);
+  AslParser(antlr4::TokenStream *input);
   ~AslParser();
 
   virtual std::string getGrammarFileName() const override;
@@ -56,7 +56,6 @@ public:
     std::vector<FunctionContext *> function();
     FunctionContext* function(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -73,7 +72,6 @@ public:
     StatementsContext *statements();
     antlr4::tree::TerminalNode *ENDFUNC();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -87,7 +85,6 @@ public:
     std::vector<Variable_declContext *> variable_decl();
     Variable_declContext* variable_decl(size_t i);
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -99,11 +96,11 @@ public:
     Variable_declContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *VAR();
-    antlr4::tree::TerminalNode *ID();
+    std::vector<antlr4::tree::TerminalNode *> ID();
+    antlr4::tree::TerminalNode* ID(size_t i);
     TypeContext *type();
     antlr4::tree::TerminalNode *ARRAY();
     antlr4::tree::TerminalNode *INTVAL();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -120,7 +117,6 @@ public:
     antlr4::tree::TerminalNode *BOOL();
     antlr4::tree::TerminalNode *CHAR();
 
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
@@ -133,7 +129,6 @@ public:
     virtual size_t getRuleIndex() const override;
     std::vector<StatementContext *> statement();
     StatementContext* statement(size_t i);
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -159,7 +154,6 @@ public:
     ProcCallContext(StatementContext *ctx);
 
     IdentContext *ident();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -169,7 +163,6 @@ public:
 
     antlr4::tree::TerminalNode *WRITE();
     ExprContext *expr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -182,7 +175,6 @@ public:
     antlr4::tree::TerminalNode *THEN();
     StatementsContext *statements();
     antlr4::tree::TerminalNode *ENDIF();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -192,7 +184,6 @@ public:
 
     antlr4::tree::TerminalNode *READ();
     Left_exprContext *left_expr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -203,7 +194,6 @@ public:
     Left_exprContext *left_expr();
     antlr4::tree::TerminalNode *ASSIGN();
     ExprContext *expr();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -213,7 +203,6 @@ public:
 
     antlr4::tree::TerminalNode *WRITE();
     antlr4::tree::TerminalNode *STRING();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -224,7 +213,6 @@ public:
     Left_exprContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     IdentContext *ident();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
@@ -253,7 +241,6 @@ public:
     ExprContext* expr(size_t i);
     antlr4::tree::TerminalNode *AND();
     antlr4::tree::TerminalNode *OR();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -268,7 +255,6 @@ public:
     antlr4::tree::TerminalNode *MINUS();
     antlr4::tree::TerminalNode *MUL();
     antlr4::tree::TerminalNode *DIV();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -277,7 +263,6 @@ public:
     ExprIdentContext(ExprContext *ctx);
 
     IdentContext *ident();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -295,7 +280,6 @@ public:
     antlr4::tree::TerminalNode *NEQ();
     antlr4::tree::TerminalNode *GET();
     antlr4::tree::TerminalNode *GEQ();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -308,7 +292,6 @@ public:
     antlr4::tree::TerminalNode *MINUS();
     antlr4::tree::TerminalNode *PLUS();
     antlr4::tree::TerminalNode *NOT();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -319,7 +302,6 @@ public:
     antlr4::tree::TerminalNode *INTVAL();
     antlr4::tree::TerminalNode *FLOATNUM();
     antlr4::tree::TerminalNode *CHAREXPR();
-
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
@@ -331,7 +313,6 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *ID();
     ExprContext *expr();
-
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
