@@ -54,17 +54,24 @@ declarations
         ;
 
 variable_decl
-        : VAR ID (MULTID)? ':' type
-        | VAR ID (MULTID)? ':' ARRAY '[' INTVAL ']' 'of' type
+        : VAR ID (multid)? ':' type // VAR ID (',' ID)*;  for   ctx->ID()
         ;
 
-//multid : (',' ID)*;
+multid : (',' ID)*;
 
-type    : INT
-        | FLOAT
-        | BOOL
-        | CHAR
-        ;
+
+type : basictype
+     | arraytype
+     ;
+
+basictype    : INT
+             | FLOAT
+             | BOOL
+             | CHAR
+             ;
+
+arraytype : ARRAY '[' INTVAL ']' 'of' basictype
+          ;
 
 paramexp 
         : (expr (',' expr)*)?
@@ -88,7 +95,7 @@ statement
           // while statement
         | WHILE expr DO statements ENDWHILE                      # whileStmt
           // A function/procedure call has a list of arguments in parenthesis (possibly empty)
-        | ident '(' paramexp ')' ';'                                      # procCall
+        | ident '(' paramexp ')' ';'                             # procCall
           // Read a variable
         | READ left_expr ';'                                     # readStmt
           // Write an expression
@@ -113,8 +120,7 @@ expr    : '(' expr ')'                              # relational
         | expr AND expr                             # boolean
         | expr OR expr                              # boolean
         | ident '(' paramexp ')'                    # funcCall
-        | (INTVAL | FLOATNUM)                       # value
-        | CHAREXPR                                  # value
+        | (INTVAL | FLOATNUM | CHAREXPR)            # value
         | ident                                     # exprIdent
         ;
 
@@ -161,7 +167,6 @@ READ      : 'read' ;
 WRITE     : 'write' ;
 RETURN    : 'return';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
-MULTID    : (',' ID)+;
 INTVAL    : ('0'..'9')+ ;
 FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')*;
 CHAREXPR  : '\'' ('a'..'z'|'A'..'Z') '\'';

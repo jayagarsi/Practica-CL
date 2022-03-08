@@ -118,12 +118,48 @@ antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext
   return 0;
 }
 
-antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
+antlrcpp::Any SymbolsVisitor::visitBasicType(AslParser::BasictypeContext *ctx) {
   DEBUG_ENTER();
   if (ctx->INT()) {
     TypesMgr::TypeId t = Types.createIntegerTy();
     putTypeDecor(ctx, t);
   }
+
+  else if (ctx->FLOAT()) {
+    TypesMgr::TypeId t = Types.createFloatTy();
+    putTypeDecor(ctx, t);
+  }
+
+  else if (ctx->BOOL()) {
+    TypesMgr::TypeId t = Types.createBooleanTy();
+    putTypeDecor(ctx, t);
+  }
+
+  else if (ctx->CHAR()) {
+    TypesMgr::TypeId t = Types.createCharacterTy();
+    putTypeDecor(ctx, t);
+  }
+
+  DEBUG_EXIT();
+  return 0;
+}
+
+antlrcpp::Any SymbolsVisitor::visitArrayType(AslParser::ArraytypeContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->basictype());
+  uint size = stoi(ctx->INTVAL()->getText());
+  TypesMgr::TypeId atype = getTypeDecor(ctx->basictype());
+  
+  TypesMgr::TypeId t = Types.createArrayTy(size, atype);
+  putTypeDecor(ctx, t);
+  DEBUG_EXIT();
+  return 0;
+}
+
+
+antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
+  DEBUG_ENTER();
+  visitChildren(ctx);
   DEBUG_EXIT();
   return 0;
 }

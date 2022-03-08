@@ -123,6 +123,7 @@ antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ct
 
 antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
   DEBUG_ENTER();
+
   visit(ctx->left_expr());
   visit(ctx->expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
@@ -132,6 +133,7 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
     Errors.incompatibleAssignment(ctx->ASSIGN());
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableLeftExpr(ctx->left_expr());
+
   DEBUG_EXIT();
   return 0;
 }
@@ -140,9 +142,13 @@ antlrcpp::Any TypeCheckVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->expr());
+
   if ((not Types.isErrorTy(t1)) and (not Types.isBooleanTy(t1)))
     Errors.booleanRequired(ctx);
   visit(ctx->statements());
+
+  if (ctx->ELSE()) visit(ctx->statementselse());
+
   DEBUG_EXIT();
   return 0;
 }
@@ -201,16 +207,24 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
 
 antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx) {
   DEBUG_ENTER();
+
   visit(ctx->expr(0));
   TypesMgr::TypeId t1 = getTypeDecor(ctx->expr(0));
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
+
   if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
       ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
     Errors.incompatibleOperator(ctx->op);
-  TypesMgr::TypeId t = Types.createIntegerTy();
+
+  TypesMgr::TypeId t;
+
+  if (Types.isFloatTy(t1) or Types.isFloatTy(t2)) t = Types.createFloatTy();
+  else t = Types.createIntegerTy();
+
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, false);
+
   DEBUG_EXIT();
   return 0;
 }

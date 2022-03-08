@@ -92,6 +92,13 @@ int main(int argc, const char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  // ------------------------------------------------------------------
+  // UNICAMENT PER DEBUGEJAR ELS ERRORS LEXICS I GRAMATICALS
+  // return EXIT_SUCCESS;
+  // SI ES VOL COMPROVAR CODEGEN I SEMANTICA COMENTAR
+  // ------------------------------------------------------------------
+
+
   // print the parse tree (for debugging purposes)
   // std::cout << tree->toStringTree(&parser) << std::endl;
 
@@ -116,6 +123,12 @@ int main(int argc, const char* argv[]) {
     std::cout << "There are semantic errors: no code generated." << std::endl;
     return EXIT_FAILURE;
   }
+
+  // ------------------------------------------------------------------
+  // UNICAMENT PER DEBUGEJAR ELS ERRORS SEMANTICS, LEXICS I GRAMATICALS
+  return EXIT_SUCCESS;
+  // SI ES VOL COMPROVAR CODEGEN COMENTAR
+  // ------------------------------------------------------------------
 
   // create a third visitor that will return the generated code
   // for each part of the tree, and will store it in 'mycode'
