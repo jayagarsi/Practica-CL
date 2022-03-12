@@ -42,7 +42,7 @@ function
         ;
 
 parameters
-        : (ID ':' type | | ID ':' ARRAY '['INTVAL']' 'of' type) (',' (ID ':' type | ID ':' ARRAY '['INTVAL']' 'of' type))*
+        : ID ':' type (',' (ID ':' type))*
         ;
 
 returnvalue
@@ -54,11 +54,8 @@ declarations
         ;
 
 variable_decl
-        : VAR ID (multid)? ':' type // VAR ID (',' ID)*;  for   ctx->ID()
+        : VAR ID (',' ID)* ':' type // VAR ID (',' ID)*;  for   ctx->ID()
         ;
-
-multid : (',' ID)*;
-
 
 type : basictype
      | arraytype

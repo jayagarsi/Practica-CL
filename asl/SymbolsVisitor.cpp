@@ -79,6 +79,12 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   std::string funcName = ctx->ID()->getText();
   SymTable::ScopeId sc = Symbols.pushNewScope(funcName);
   putScopeDecor(ctx, sc);
+  if (ctx->parameters()) visit(ctx->parameters());
+  if (ctx->returnvalue()) {
+    visit(ctx->returnvalue()->type());
+    TypesMgr::TypeId t1 = getTypeDecor(ctx->returnvalue()->type());
+     Symbols.addLocalVar(funcName, t1);
+  }
   visit(ctx->declarations());
   // Symbols.print();
   Symbols.popScope();
@@ -96,6 +102,32 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   return 0;
 }
 
+antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx) {
+  DEBUG_ENTER();
+
+  for (uint i = 0; i < ctx->ID().size(); ++i) {
+    visit(ctx->type(i));
+    std::string ident = ctx->ID(i)->getText();
+    if (Symbols.findInCurrentScope(ident)) {
+      Errors.declaredIdent(ctx->ID(i));
+    }
+    else {
+      TypesMgr::TypeId t1 = getTypeDecor(ctx->type(i));
+      Symbols.addLocalVar(ident, t1);
+    }
+  }
+
+  DEBUG_EXIT();
+  return 0;
+}
+
+antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ctx) {
+  DEBUG_ENTER();
+
+  DEBUG_EXIT();
+  return 0;
+}
+
 antlrcpp::Any SymbolsVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
   DEBUG_ENTER();
   visitChildren(ctx);
@@ -106,14 +138,17 @@ antlrcpp::Any SymbolsVisitor::visitDeclarations(AslParser::DeclarationsContext *
 antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->type());
-  std::string ident = ctx->ID()->getText();
-  if (Symbols.findInCurrentScope(ident)) {
-    Errors.declaredIdent(ctx->ID());
+  for (auto & oneID : ctx->ID()) {
+    std::string ident = oneID->getText();
+    if (Symbols.findInCurrentScope(ident)) {
+      Errors.declaredIdent(oneID);
+    }
+    else {
+      TypesMgr::TypeId t1 = getTypeDecor(ctx->type());
+      Symbols.addLocalVar(ident, t1);
+    }
   }
-  else {
-    TypesMgr::TypeId t1 = getTypeDecor(ctx->type());
-    Symbols.addLocalVar(ident, t1);
-  }
+  
   DEBUG_EXIT();
   return 0;
 }
