@@ -42,7 +42,7 @@
 #include <cstddef>    // std::size_t
 
 // uncomment the following line to enable debugging messages with DEBUG*
-// #define DEBUG_BUILD
+//#define DEBUG_BUILD
 #include "../common/debug.h"
 
 // using namespace std;
@@ -65,7 +65,7 @@ antlrcpp::Any SymbolsVisitor::visitProgram(AslParser::ProgramContext *ctx) {
   DEBUG_ENTER();
   SymTable::ScopeId sc = Symbols.pushNewScope(SymTable::GLOBAL_SCOPE_NAME);
   putScopeDecor(ctx, sc);
-  for (auto ctxFunc : ctx->function()) { 
+  for (auto ctxFunc : ctx->function()) {
     visit(ctxFunc);
   }
   // Symbols.print();
@@ -148,7 +148,7 @@ antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext
       Symbols.addLocalVar(ident, t1);
     }
   }
-  
+
   DEBUG_EXIT();
   return 0;
 }
@@ -184,7 +184,7 @@ antlrcpp::Any SymbolsVisitor::visitArrayType(AslParser::ArraytypeContext *ctx) {
   visit(ctx->basictype());
   uint size = stoi(ctx->INTVAL()->getText());
   TypesMgr::TypeId atype = getTypeDecor(ctx->basictype());
-  
+
   TypesMgr::TypeId t = Types.createArrayTy(size, atype);
   putTypeDecor(ctx, t);
   DEBUG_EXIT();

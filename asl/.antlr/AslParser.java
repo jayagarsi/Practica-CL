@@ -967,6 +967,7 @@ public class AslParser extends Parser {
 		}
 	}
 	public static class BooleanContext extends ExprContext {
+		public Token op;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -1000,13 +1001,13 @@ public class AslParser extends Parser {
 	}
 	public static class RelationalContext extends ExprContext {
 		public Token op;
+		public TerminalNode ID() { return getToken(AslParser.ID, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode ID() { return getToken(AslParser.ID, 0); }
 		public TerminalNode LET() { return getToken(AslParser.LET, 0); }
 		public TerminalNode LEQ() { return getToken(AslParser.LEQ, 0); }
 		public TerminalNode EQUAL() { return getToken(AslParser.EQUAL, 0); }
@@ -1033,6 +1034,12 @@ public class AslParser extends Parser {
 			return getRuleContext(ParamexpContext.class,0);
 		}
 		public FuncCallContext(ExprContext ctx) { copyFrom(ctx); }
+	}
+	public static class ParenthesisContext extends ExprContext {
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
+		public ParenthesisContext(ExprContext ctx) { copyFrom(ctx); }
 	}
 	public static class ValueContext extends ExprContext {
 		public TerminalNode INTVAL() { return getToken(AslParser.INTVAL, 0); }
@@ -1062,7 +1069,7 @@ public class AslParser extends Parser {
 			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
 			case 1:
 				{
-				_localctx = new RelationalContext(_localctx);
+				_localctx = new ParenthesisContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
@@ -1252,7 +1259,7 @@ public class AslParser extends Parser {
 						setState(197);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(198);
-						match(AND);
+						((BooleanContext)_localctx).op = match(AND);
 						setState(199);
 						expr(6);
 						}
@@ -1264,7 +1271,7 @@ public class AslParser extends Parser {
 						setState(200);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(201);
-						match(OR);
+						((BooleanContext)_localctx).op = match(OR);
 						setState(202);
 						expr(5);
 						}

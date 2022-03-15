@@ -70,7 +70,7 @@ basictype    : INT
 arraytype : ARRAY '[' INTVAL ']' 'of' basictype
           ;
 
-paramexp 
+paramexp
         : (expr (',' expr)*)?
         ;
 
@@ -102,15 +102,15 @@ left_expr
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : '(' expr ')'                              # relational
+expr    : '(' expr ')'                              # parenthesis
         | op=(MINUS|PLUS|NOT) expr                  # unary
         | ID '[' expr ']'                           # relational
         | (PLUS | MINUS) expr                       # arithmetic
         | expr op=(MUL|DIV|MOD) expr                # arithmetic
         | expr op=(PLUS|MINUS) expr                 # arithmetic
         | expr op=(LET|LEQ|EQUAL|NEQ|GET|GEQ) expr  # relational
-        | expr AND expr                             # boolean
-        | expr OR expr                              # boolean
+        | expr op=AND expr                             # boolean
+        | expr op=OR expr                              # boolean
         | ident '(' paramexp ')'                    # funcCall
         | (INTVAL | FLOATNUM | CHAREXPR)            # value
         | ident                                     # exprIdent
