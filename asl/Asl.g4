@@ -104,7 +104,7 @@ left_expr
 // Grammar for expressions with boolean, relational and aritmetic operators
 expr    : '(' expr ')'                              # parenthesis
         | op=(MINUS|PLUS|NOT) expr                  # unary
-        | ID '[' expr ']'                           # relational
+        | ID '[' expr ']'                           # arrayOp
         | (PLUS | MINUS) expr                       # arithmetic
         | expr op=(MUL|DIV|MOD) expr                # arithmetic
         | expr op=(PLUS|MINUS) expr                 # arithmetic
@@ -112,8 +112,8 @@ expr    : '(' expr ')'                              # parenthesis
         | expr op=AND expr                             # boolean
         | expr op=OR expr                              # boolean
         | ident '(' paramexp ')'                    # funcCall
-        | (INTVAL | FLOATNUM | CHAREXPR)            # value
-        | ident                                     # exprIdent
+        | (INTVAL | FLOATNUM | CHAREXPR | TRUE | FALSE)          # value
+        | ident                                  # exprIdent
         ;
 
 // Identifiers
@@ -135,6 +135,8 @@ GET       : '>';
 GEQ       : '>=';
 NOT       : 'not';
 AND       : 'and';
+TRUE      : 'true';
+FALSE     : 'false';
 OR        : 'or';
 PLUS      : '+' ;
 MINUS     : '-' ;

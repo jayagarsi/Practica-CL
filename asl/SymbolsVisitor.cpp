@@ -194,24 +194,24 @@ antlrcpp::Any SymbolsVisitor::visitArrayType(AslParser::ArraytypeContext *ctx) {
 
 antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
   DEBUG_ENTER();
-  visitChildren(ctx);
+  antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
-  return 0;
+  return r;
 }
 
-// antlrcpp::Any SymbolsVisitor::visitStatements(AslParser::StatementsContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any SymbolsVisitor::visitStatements(AslParser::StatementsContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
-// antlrcpp::Any SymbolsVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any SymbolsVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
 // antlrcpp::Any SymbolsVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
 //   DEBUG_ENTER();
@@ -248,12 +248,12 @@ antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
 //   return r;
 // }
 
-// antlrcpp::Any SymbolsVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any SymbolsVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
 // antlrcpp::Any SymbolsVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
 //   DEBUG_ENTER();
@@ -283,12 +283,12 @@ antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
 //   return r;
 // }
 
-// antlrcpp::Any SymbolsVisitor::visitIdent(AslParser::IdentContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any SymbolsVisitor::visitIdent(AslParser::IdentContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
 
 // Getters for the necessary tree node atributes:

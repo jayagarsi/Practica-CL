@@ -42,7 +42,7 @@
 //#define DEBUG_BUILD
 #include "../common/debug.h"
 
-// using namespace std;
+ using namespace std;
 
 
 // Constructor
@@ -87,32 +87,47 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   SymTable::ScopeId sc = getScopeDecor(ctx);
   Symbols.pushThisScope(sc);
   // Symbols.print();
+  //visit(ctx->declarations());
   visit(ctx->statements());
   Symbols.popScope();
   DEBUG_EXIT();
   return 0;
 }
 
-// antlrcpp::Any TypeCheckVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any TypeCheckVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
-// antlrcpp::Any TypeCheckVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any TypeCheckVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
-// antlrcpp::Any TypeCheckVisitor::visitType(AslParser::TypeContext *ctx) {
-//   DEBUG_ENTER();
-//   antlrcpp::Any r = visitChildren(ctx);
-//   DEBUG_EXIT();
-//   return r;
-// }
+antlrcpp::Any TypeCheckVisitor::visitType(AslParser::TypeContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
+
+antlrcpp::Any TypeCheckVisitor::visitBasictype(AslParser::BasictypeContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = ctx->getText();
+  DEBUG_EXIT();
+  return r;
+}
+
+antlrcpp::Any TypeCheckVisitor::visitArraytype(AslParser::ArraytypeContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
 
 antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ctx) {
   DEBUG_ENTER();
@@ -127,14 +142,16 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   visit(ctx->left_expr());
   visit(ctx->expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
+  cout << t1 << " " << ctx->left_expr()->getText()<< endl;
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr());
+  cout << t2 << " " << ctx->expr()->getText() << endl;
   if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
       (not Types.copyableTypes(t1, t2)))
     Errors.incompatibleAssignment(ctx->ASSIGN());
 
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableLeftExpr(ctx->left_expr());
-
+   
   DEBUG_EXIT();
   return 0;
 }
@@ -151,8 +168,22 @@ antlrcpp::Any TypeCheckVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   if (ctx->ELSE()) visit(ctx->statements(1));
 
   DEBUG_EXIT();
+  return 0;      
+}
+
+antlrcpp::Any TypeCheckVisitor::visitWhileStmt(AslParser::WhileStmtContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->expr());
+  TypesMgr::TypeId t1 = getTypeDecor(ctx->expr());
+
+  if ((not Types.isErrorTy(t1)) and (not Types.isBooleanTy(t1)))
+    Errors.booleanRequired(ctx);
+  visit(ctx->statements());
+
+  DEBUG_EXIT();
   return 0;
 }
+
 
 antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   DEBUG_ENTER();
@@ -216,8 +247,7 @@ antlrcpp::Any TypeCheckVisitor::visitUnary(AslParser::UnaryContext *ctx) {
       Errors.incompatibleOperator(ctx->op);
   }
   else{
-  if (((not Types.isErrorTy(t1)) and ((not Types.isNumericTy(t1)) or
-      not Types.isFloatTy(t1))))
+  if ((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1)))
     Errors.incompatibleOperator(ctx->op);
   }
   putTypeDecor(ctx, t1);
@@ -285,8 +315,14 @@ antlrcpp::Any TypeCheckVisitor::visitBoolean(AslParser::BooleanContext *ctx) {
 
 antlrcpp::Any TypeCheckVisitor::visitValue(AslParser::ValueContext *ctx) {
   DEBUG_ENTER();
-  TypesMgr::TypeId t = Types.createIntegerTy();
-  putTypeDecor(ctx, t);
+  TypesMgr::TypeId t1 = Types.createIntegerTy();
+  TypesMgr::TypeId t2 = Types.createFloatTy();
+  TypesMgr::TypeId t3 = Types.createCharacterTy();
+  TypesMgr::TypeId t4 = Types.createBooleanTy();
+  if(ctx->INTVAL() ) putTypeDecor(ctx, t1);
+  else if(ctx->FLOATNUM() ) putTypeDecor(ctx, t2);
+  else if(ctx->CHAREXPR() ) putTypeDecor(ctx, t3);
+  else if (ctx->TRUE() or ctx->FALSE()) putTypeDecor(ctx, t4);
   putIsLValueDecor(ctx, false);
   DEBUG_EXIT();
   return 0;
