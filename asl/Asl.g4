@@ -38,7 +38,7 @@ program : function+ EOF
 
 // A function has a name, a list of parameters and a list of statements
 function
-        : FUNC ID '(' parameters? ')' returnvalue? declarations statements (RETURN (expr)? ';')* ENDFUNC
+        : FUNC ID '(' parameters? ')' returnvalue? declarations statements ENDFUNC
         ;
 
 parameters
@@ -54,7 +54,7 @@ declarations
         ;
 
 variable_decl
-        : VAR ID (',' ID)* ':' type // VAR ID (',' ID)*;  for   ctx->ID()
+        : VAR ID (',' ID)* ':' type 
         ;
 
 type : basictype
@@ -81,19 +81,21 @@ statements
 // The different types of instructions
 statement
           // Assignment
-        : left_expr ASSIGN expr ';'                              # assignStmt
+        : left_expr ASSIGN expr ';'                             # assignStmt
           // if-then-else statement (else is optional)
-        | IF expr THEN statements (ELSE statements)? ENDIF   # ifStmt
+        | IF expr THEN statements (ELSE statements)? ENDIF      # ifStmt
           // while statement
-        | WHILE expr DO statements ENDWHILE                      # whileStmt
+        | WHILE expr DO statements ENDWHILE                     # whileStmt
           // A function/procedure call has a list of arguments in parenthesis (possibly empty)
-        | ident '(' paramexp ')' ';'                             # procCall
+        | ident '(' paramexp ')' ';'                            # procCall
+          // Return statements
+        | RETURN expr? ';'                                      # returnStmt
           // Read a variable
-        | READ left_expr ';'                                     # readStmt
+        | READ left_expr ';'                                    # readStmt
           // Write an expression
-        | WRITE expr ';'                                         # writeExpr
+        | WRITE expr ';'                                        # writeExpr
           // Write a string
-        | WRITE STRING ';'                                       # writeString
+        | WRITE STRING ';'                                      # writeString
         ;
 
 // Grammar for left expressions (l-values in C++)
@@ -102,18 +104,17 @@ left_expr
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
-expr    : '(' expr ')'                              # parenthesis
-        | op=(MINUS|PLUS|NOT) expr                  # unary
-        | ID '[' expr ']'                           # arrayOp
-        | (PLUS | MINUS) expr                       # arithmetic
-        | expr op=(MUL|DIV|MOD) expr                # arithmetic
-        | expr op=(PLUS|MINUS) expr                 # arithmetic
-        | expr op=(LET|LEQ|EQUAL|NEQ|GET|GEQ) expr  # relational
-        | expr op=AND expr                             # boolean
-        | expr op=OR expr                              # boolean
-        | ident '(' paramexp ')'                    # funcCall
-        | (INTVAL | FLOATNUM | CHAREXPR | TRUE | FALSE)          # value
-        | ident                                  # exprIdent
+expr    : '(' expr ')'                                          # parenthesis
+        | ID '[' expr ']'                                       # arrayOp
+        | ident '(' paramexp ')'                                # funcCall
+        | op=(NOT|PLUS|MINUS) expr                              # unary
+        | expr op=(MUL|DIV|MOD) expr                            # arithmetic
+        | expr op=(PLUS|MINUS) expr                             # arithmetic
+        | expr op=(LET|LEQ|EQUAL|NEQ|GET|GEQ) expr              # relational
+        | expr op=AND expr                                      # boolean
+        | expr op=OR expr                                       # boolean
+        | (INTVAL | FLOATNUM | BOOLVAL | CHAREXPR)              # value
+        | ident                                                 # exprIdent
         ;
 
 // Identifiers
@@ -126,28 +127,31 @@ ident   : ID
 //////////////////////////////////////////////////
 
 ASSIGN    : '=' ;
-ARRAY     : 'array';
+
 EQUAL     : '==' ;
 NEQ       : '!=' ;
 LET       : '<';
 LEQ       : '<=';
 GET       : '>';
 GEQ       : '>=';
+
 NOT       : 'not';
 AND       : 'and';
-TRUE      : 'true';
-FALSE     : 'false';
 OR        : 'or';
+
 PLUS      : '+' ;
 MINUS     : '-' ;
 MUL       : '*';
 DIV       : '/';
 MOD       : '%';
+
 VAR       : 'var';
 INT       : 'int';
 FLOAT     : 'float';
 CHAR      : 'char';
 BOOL      : 'bool';
+ARRAY     : 'array';
+
 IF        : 'if' ;
 THEN      : 'then' ;
 ELSE      : 'else' ;
@@ -157,13 +161,16 @@ DO        : 'do';
 ENDWHILE  : 'endwhile';
 FUNC      : 'func' ;
 ENDFUNC   : 'endfunc' ;
+RETURN    : 'return';
+
 READ      : 'read' ;
 WRITE     : 'write' ;
-RETURN    : 'return';
+
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
 INTVAL    : ('0'..'9')+ ;
-FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')*;
+FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')+;
 CHAREXPR  : '\'' ('a'..'z'|'A'..'Z') '\'';
+BOOLVAL   : 'true' | 'false';
 
 // Strings (in quotes) with escape sequences
 STRING    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ;
