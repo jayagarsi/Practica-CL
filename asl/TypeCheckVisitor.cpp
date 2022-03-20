@@ -340,7 +340,7 @@ antlrcpp::Any TypeCheckVisitor::visitBoolean(AslParser::BooleanContext *ctx) {
 
 antlrcpp::Any TypeCheckVisitor::visitValue(AslParser::ValueContext *ctx) {
   DEBUG_ENTER();
-  TypesMgr::TypeId t;
+    TypesMgr::TypeId t;
 
   if (ctx->INTVAL()) t = Types.createIntegerTy();
   else if (ctx->FLOATNUM()) t = Types.createFloatTy();

@@ -166,11 +166,12 @@ RETURN    : 'return';
 READ      : 'read' ;
 WRITE     : 'write' ;
 
+BOOLVAL   : 'true' | 'false';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
 INTVAL    : ('0'..'9')+ ;
 FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')+;
 CHAREXPR  : '\'' ('a'..'z'|'A'..'Z') '\'';
-BOOLVAL   : 'true' | 'false';
+
 
 // Strings (in quotes) with escape sequences
 STRING    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ;

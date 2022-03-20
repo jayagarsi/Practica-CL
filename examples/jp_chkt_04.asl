@@ -1,5 +1,6 @@
 func f(a : int, b: bool) : int
   var b: int
+  var b : int
   var f : bool
   return 14;
 endfunc

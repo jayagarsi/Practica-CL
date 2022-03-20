@@ -20,9 +20,8 @@ public class AslParser extends Parser {
 		EQUAL=10, NEQ=11, LET=12, LEQ=13, GET=14, GEQ=15, NOT=16, AND=17, OR=18, 
 		PLUS=19, MINUS=20, MUL=21, DIV=22, MOD=23, VAR=24, INT=25, FLOAT=26, CHAR=27, 
 		BOOL=28, ARRAY=29, IF=30, THEN=31, ELSE=32, ENDIF=33, WHILE=34, DO=35, 
-		ENDWHILE=36, FUNC=37, ENDFUNC=38, RETURN=39, READ=40, WRITE=41, ID=42, 
-		INTVAL=43, FLOATNUM=44, CHAREXPR=45, BOOLVAL=46, STRING=47, COMMENT=48, 
-		WS=49;
+		ENDWHILE=36, FUNC=37, ENDFUNC=38, RETURN=39, READ=40, WRITE=41, BOOLVAL=42, 
+		ID=43, INTVAL=44, FLOATNUM=45, CHAREXPR=46, STRING=47, COMMENT=48, WS=49;
 	public static final int
 		RULE_program = 0, RULE_function = 1, RULE_parameters = 2, RULE_returnvalue = 3, 
 		RULE_declarations = 4, RULE_variable_decl = 5, RULE_type = 6, RULE_basictype = 7, 
@@ -53,7 +52,7 @@ public class AslParser extends Parser {
 			"NEQ", "LET", "LEQ", "GET", "GEQ", "NOT", "AND", "OR", "PLUS", "MINUS", 
 			"MUL", "DIV", "MOD", "VAR", "INT", "FLOAT", "CHAR", "BOOL", "ARRAY", 
 			"IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO", "ENDWHILE", "FUNC", "ENDFUNC", 
-			"RETURN", "READ", "WRITE", "ID", "INTVAL", "FLOATNUM", "CHAREXPR", "BOOLVAL", 
+			"RETURN", "READ", "WRITE", "BOOLVAL", "ID", "INTVAL", "FLOATNUM", "CHAREXPR", 
 			"STRING", "COMMENT", "WS"
 		};
 	}
@@ -597,7 +596,7 @@ public class AslParser extends Parser {
 			setState(105);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << PLUS) | (1L << MINUS) | (1L << ID) | (1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR) | (1L << BOOLVAL))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << PLUS) | (1L << MINUS) | (1L << BOOLVAL) | (1L << ID) | (1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR))) != 0)) {
 				{
 				setState(97);
 				expr(0);
@@ -856,7 +855,7 @@ public class AslParser extends Parser {
 				setState(142);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << PLUS) | (1L << MINUS) | (1L << ID) | (1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR) | (1L << BOOLVAL))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << PLUS) | (1L << MINUS) | (1L << BOOLVAL) | (1L << ID) | (1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR))) != 0)) {
 					{
 					setState(141);
 					expr(0);
@@ -1137,7 +1136,7 @@ public class AslParser extends Parser {
 				_prevctx = _localctx;
 				setState(177);
 				_la = _input.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR) | (1L << BOOLVAL))) != 0)) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << BOOLVAL) | (1L << INTVAL) | (1L << FLOATNUM) | (1L << CHAREXPR))) != 0)) ) {
 				_errHandler.recoverInline(this);
 				}
 				else {
@@ -1367,21 +1366,21 @@ public class AslParser extends Parser {
 		"\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\7\17\u00c7\n\17\f\17\16"+
 		"\17\u00ca\13\17\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u00d2\n\20\3\20\2\3"+
 		"\34\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\b\3\2\33\36\4\2\22\22"+
-		"\25\26\3\2-\60\3\2\27\31\3\2\25\26\3\2\f\21\2\u00e2\2!\3\2\2\2\4\'\3\2"+
-		"\2\2\6\65\3\2\2\2\bA\3\2\2\2\nG\3\2\2\2\fJ\3\2\2\2\16X\3\2\2\2\20Z\3\2"+
-		"\2\2\22\\\3\2\2\2\24k\3\2\2\2\26p\3\2\2\2\30\u009e\3\2\2\2\32\u00a0\3"+
-		"\2\2\2\34\u00b5\3\2\2\2\36\u00d1\3\2\2\2 \"\5\4\3\2! \3\2\2\2\"#\3\2\2"+
-		"\2#!\3\2\2\2#$\3\2\2\2$%\3\2\2\2%&\7\2\2\3&\3\3\2\2\2\'(\7\'\2\2()\7,"+
-		"\2\2)+\7\3\2\2*,\5\6\4\2+*\3\2\2\2+,\3\2\2\2,-\3\2\2\2-/\7\4\2\2.\60\5"+
-		"\b\5\2/.\3\2\2\2/\60\3\2\2\2\60\61\3\2\2\2\61\62\5\n\6\2\62\63\5\26\f"+
-		"\2\63\64\7(\2\2\64\5\3\2\2\2\65\66\7,\2\2\66\67\7\5\2\2\67>\5\16\b\28"+
-		"9\7\6\2\29:\7,\2\2:;\7\5\2\2;=\5\16\b\2<8\3\2\2\2=@\3\2\2\2><\3\2\2\2"+
+		"\25\26\4\2,,.\60\3\2\27\31\3\2\25\26\3\2\f\21\2\u00e2\2!\3\2\2\2\4\'\3"+
+		"\2\2\2\6\65\3\2\2\2\bA\3\2\2\2\nG\3\2\2\2\fJ\3\2\2\2\16X\3\2\2\2\20Z\3"+
+		"\2\2\2\22\\\3\2\2\2\24k\3\2\2\2\26p\3\2\2\2\30\u009e\3\2\2\2\32\u00a0"+
+		"\3\2\2\2\34\u00b5\3\2\2\2\36\u00d1\3\2\2\2 \"\5\4\3\2! \3\2\2\2\"#\3\2"+
+		"\2\2#!\3\2\2\2#$\3\2\2\2$%\3\2\2\2%&\7\2\2\3&\3\3\2\2\2\'(\7\'\2\2()\7"+
+		"-\2\2)+\7\3\2\2*,\5\6\4\2+*\3\2\2\2+,\3\2\2\2,-\3\2\2\2-/\7\4\2\2.\60"+
+		"\5\b\5\2/.\3\2\2\2/\60\3\2\2\2\60\61\3\2\2\2\61\62\5\n\6\2\62\63\5\26"+
+		"\f\2\63\64\7(\2\2\64\5\3\2\2\2\65\66\7-\2\2\66\67\7\5\2\2\67>\5\16\b\2"+
+		"89\7\6\2\29:\7-\2\2:;\7\5\2\2;=\5\16\b\2<8\3\2\2\2=@\3\2\2\2><\3\2\2\2"+
 		">?\3\2\2\2?\7\3\2\2\2@>\3\2\2\2AB\7\5\2\2BC\5\16\b\2C\t\3\2\2\2DF\5\f"+
 		"\7\2ED\3\2\2\2FI\3\2\2\2GE\3\2\2\2GH\3\2\2\2H\13\3\2\2\2IG\3\2\2\2JK\7"+
-		"\32\2\2KP\7,\2\2LM\7\6\2\2MO\7,\2\2NL\3\2\2\2OR\3\2\2\2PN\3\2\2\2PQ\3"+
+		"\32\2\2KP\7-\2\2LM\7\6\2\2MO\7-\2\2NL\3\2\2\2OR\3\2\2\2PN\3\2\2\2PQ\3"+
 		"\2\2\2QS\3\2\2\2RP\3\2\2\2ST\7\5\2\2TU\5\16\b\2U\r\3\2\2\2VY\5\20\t\2"+
 		"WY\5\22\n\2XV\3\2\2\2XW\3\2\2\2Y\17\3\2\2\2Z[\t\2\2\2[\21\3\2\2\2\\]\7"+
-		"\37\2\2]^\7\7\2\2^_\7-\2\2_`\7\b\2\2`a\7\t\2\2ab\5\20\t\2b\23\3\2\2\2"+
+		"\37\2\2]^\7\7\2\2^_\7.\2\2_`\7\b\2\2`a\7\t\2\2ab\5\20\t\2b\23\3\2\2\2"+
 		"ch\5\34\17\2de\7\6\2\2eg\5\34\17\2fd\3\2\2\2gj\3\2\2\2hf\3\2\2\2hi\3\2"+
 		"\2\2il\3\2\2\2jh\3\2\2\2kc\3\2\2\2kl\3\2\2\2l\25\3\2\2\2mo\5\30\r\2nm"+
 		"\3\2\2\2or\3\2\2\2pn\3\2\2\2pq\3\2\2\2q\27\3\2\2\2rp\3\2\2\2st\5\32\16"+
@@ -1400,7 +1399,7 @@ public class AslParser extends Parser {
 		"\2\2\u009e\u008e\3\2\2\2\u009e\u0093\3\2\2\2\u009e\u0097\3\2\2\2\u009e"+
 		"\u009b\3\2\2\2\u009f\31\3\2\2\2\u00a0\u00a1\5\36\20\2\u00a1\33\3\2\2\2"+
 		"\u00a2\u00a3\b\17\1\2\u00a3\u00a4\7\3\2\2\u00a4\u00a5\5\34\17\2\u00a5"+
-		"\u00a6\7\4\2\2\u00a6\u00b6\3\2\2\2\u00a7\u00a8\7,\2\2\u00a8\u00a9\7\7"+
+		"\u00a6\7\4\2\2\u00a6\u00b6\3\2\2\2\u00a7\u00a8\7-\2\2\u00a8\u00a9\7\7"+
 		"\2\2\u00a9\u00aa\5\34\17\2\u00aa\u00ab\7\b\2\2\u00ab\u00b6\3\2\2\2\u00ac"+
 		"\u00ad\5\36\20\2\u00ad\u00ae\7\3\2\2\u00ae\u00af\5\24\13\2\u00af\u00b0"+
 		"\7\4\2\2\u00b0\u00b6\3\2\2\2\u00b1\u00b2\t\3\2\2\u00b2\u00b6\5\34\17\n"+
@@ -1413,8 +1412,8 @@ public class AslParser extends Parser {
 		"\7\u00c3\u00c4\f\5\2\2\u00c4\u00c5\7\24\2\2\u00c5\u00c7\5\34\17\6\u00c6"+
 		"\u00b7\3\2\2\2\u00c6\u00ba\3\2\2\2\u00c6\u00bd\3\2\2\2\u00c6\u00c0\3\2"+
 		"\2\2\u00c6\u00c3\3\2\2\2\u00c7\u00ca\3\2\2\2\u00c8\u00c6\3\2\2\2\u00c8"+
-		"\u00c9\3\2\2\2\u00c9\35\3\2\2\2\u00ca\u00c8\3\2\2\2\u00cb\u00d2\7,\2\2"+
-		"\u00cc\u00cd\7,\2\2\u00cd\u00ce\7\7\2\2\u00ce\u00cf\5\34\17\2\u00cf\u00d0"+
+		"\u00c9\3\2\2\2\u00c9\35\3\2\2\2\u00ca\u00c8\3\2\2\2\u00cb\u00d2\7-\2\2"+
+		"\u00cc\u00cd\7-\2\2\u00cd\u00ce\7\7\2\2\u00ce\u00cf\5\34\17\2\u00cf\u00d0"+
 		"\7\b\2\2\u00d0\u00d2\3\2\2\2\u00d1\u00cb\3\2\2\2\u00d1\u00cc\3\2\2\2\u00d2"+
 		"\37\3\2\2\2\23#+/>GPXhkp~\u0090\u009e\u00b5\u00c6\u00c8\u00d1";
 	public static final ATN _ATN =
