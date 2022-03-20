@@ -101,9 +101,13 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
       else if (Types.isFloatTy(tbasicRet)) tRet = Types.createFloatTy();
       else if (Types.isBooleanTy(tbasicRet)) tRet = Types.createBooleanTy();
       else if (Types.isCharacterTy(tbasicRet)) tRet = Types.createCharacterTy();
+     
+      
     }
     TypesMgr::TypeId tFunc = Types.createFunctionTy(lParamsTy, tRet);
+    //cout << tFunc << " funcion del tipo " << tRet << endl;
     Symbols.addFunction(ident, tFunc);
+
   }
   
   DEBUG_EXIT();
@@ -272,7 +276,7 @@ antlrcpp::Any SymbolsVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
   return r;
 }
 
-antlrcpp::Any SymbolsVisitor::visitFunCCall(AslParser::FuncCallContext *ctx) {
+antlrcpp::Any SymbolsVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();

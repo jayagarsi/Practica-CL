@@ -87,6 +87,8 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   SymTable::ScopeId sc = getScopeDecor(ctx);
   Symbols.pushThisScope(sc);
   // Symbols.print();
+  if(ctx->parameters()) visit(ctx->parameters());
+  if(ctx->returnvalue()) visit(ctx->returnvalue());
   visit(ctx->declarations());
   visit(ctx->statements());
   Symbols.popScope();
@@ -143,7 +145,6 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   visit(ctx->expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr());
-
   if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
       (not Types.copyableTypes(t1, t2)))
     Errors.incompatibleAssignment(ctx->ASSIGN());
@@ -207,8 +208,10 @@ antlrcpp::Any TypeCheckVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   visit(ctx->left_expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
   if ((not Types.isErrorTy(t1)) and (not Types.isPrimitiveTy(t1)) and
-      (not Types.isFunctionTy(t1)))
+      (not Types.isFunctionTy(t1)) ){
     Errors.readWriteRequireBasic(ctx);
+    cout << ctx->left_expr()->ident()->ID()->getText() << " " << t1 << endl;
+      }
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableExpression(ctx);
   DEBUG_EXIT();
@@ -243,7 +246,7 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   return 0;
 }
 
-antlrcpp::Any TypeCheckVisitor::visitFunCCall(AslParser::FuncCallContext *ctx) {
+antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
   TypesMgr::TypeId t = getTypeDecor(ctx->ident());
@@ -307,7 +310,6 @@ antlrcpp::Any TypeCheckVisitor::visitRelational(AslParser::RelationalContext *ct
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
   std::string oper = ctx->op->getText();
-
   if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
       (not Types.comparableTypes(t1, t2, oper)))
     Errors.incompatibleOperator(ctx->op);
@@ -326,7 +328,6 @@ antlrcpp::Any TypeCheckVisitor::visitBoolean(AslParser::BooleanContext *ctx) {
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
   std::string oper = ctx->op->getText();
-
   if ( (not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) ) {
     if ( (not Types.isBooleanTy(t1)) or (not Types.isBooleanTy(t2)) )
       Errors.incompatibleOperator(ctx->op);
@@ -381,6 +382,10 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   }
   else {
     TypesMgr::TypeId t1 = Symbols.getType(ident);
+
+    if(Types.isFunctionTy(t1)){
+      t1 = Types.getFuncReturnType(t1);
+    }
     if (ctx->expr()) {
       if (not Types.isArrayTy(t1)) {
         Errors.nonArrayInArrayAccess(ctx);
