@@ -45,7 +45,7 @@
 //#define DEBUG_BUILD
 #include "../common/debug.h"
 
-// using namespace std;
+using namespace std;
 
 
 // Constructor
@@ -157,7 +157,7 @@ antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext
   return 0;
 }
 
-antlrcpp::Any SymbolsVisitor::visitBasicType(AslParser::BasictypeContext *ctx) {
+antlrcpp::Any SymbolsVisitor::visitBasictype(AslParser::BasictypeContext *ctx) {
   DEBUG_ENTER();
 
   TypesMgr::TypeId t;
@@ -173,7 +173,7 @@ antlrcpp::Any SymbolsVisitor::visitBasicType(AslParser::BasictypeContext *ctx) {
   return 0;
 }
 
-antlrcpp::Any SymbolsVisitor::visitArrayType(AslParser::ArraytypeContext *ctx) {
+antlrcpp::Any SymbolsVisitor::visitArraytype(AslParser::ArraytypeContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->basictype());
   uint size = stoi(ctx->INTVAL()->getText());
@@ -200,7 +200,7 @@ antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
 
   putTypeDecor(ctx, t);
   DEBUG_EXIT();
-  return 0;
+  return t;
 }
 
 antlrcpp::Any SymbolsVisitor::visitStatements(AslParser::StatementsContext *ctx) {
@@ -276,9 +276,12 @@ antlrcpp::Any SymbolsVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx)
 
 antlrcpp::Any SymbolsVisitor::visitRelational(AslParser::RelationalContext *ctx) {
   DEBUG_ENTER();
-  antlrcpp::Any r = visitChildren(ctx);
+  visit(ctx->expr(0));
+  visit(ctx->expr(1));
+  TypesMgr::TypeId t = Types.createBooleanTy();
+  putTypeDecor(ctx, t);
   DEBUG_EXIT();
-  return r;
+  return 0;
 }
 
 antlrcpp::Any SymbolsVisitor::visitValue(AslParser::ValueContext *ctx) {
