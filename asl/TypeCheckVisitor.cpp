@@ -237,12 +237,17 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   visit(ctx->ident());
   TypesMgr::TypeId t = getTypeDecor(ctx->ident());
   bool b = getIsLValueDecor(ctx->ident());
-/*
-  if (ctx->ident()->expr()) {
+  putTypeDecor(ctx, t);
+  putIsLValueDecor(ctx, b);
+  DEBUG_EXIT();
+  return 0;
+}
 
-  }
-*/
-  
+antlrcpp::Any TypeCheckVisitor::visitFunCCall(AslParser::FuncCallContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->ident());
+  TypesMgr::TypeId t = getTypeDecor(ctx->ident());
+  bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, b);
   DEBUG_EXIT();
@@ -367,7 +372,7 @@ antlrcpp::Any TypeCheckVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx)
 
 antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
-  std::string ident = ctx->getText();
+  std::string ident = ctx->ID()->getText();
   if (Symbols.findInStack(ident) == -1) {
     Errors.undeclaredIdent(ctx->ID());
     TypesMgr::TypeId te = Types.createErrorTy();
@@ -376,6 +381,18 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   }
   else {
     TypesMgr::TypeId t1 = Symbols.getType(ident);
+    if (ctx->expr()) {
+      if (not Types.isArrayTy(t1)) {
+        Errors.nonArrayInArrayAccess(ctx);
+        t1 = Types.createErrorTy();
+      }
+      visit(ctx->expr());
+      TypesMgr::TypeId t = getTypeDecor(ctx->expr());
+      if (not Types.isIntegerTy(t)) {
+        Errors.nonIntegerIndexInArrayAccess(ctx->expr());
+        t = Types.createErrorTy();
+      }
+    }
     putTypeDecor(ctx, t1);
     if (Symbols.isFunctionClass(ident))
       putIsLValueDecor(ctx, false);

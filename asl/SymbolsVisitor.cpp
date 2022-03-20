@@ -68,7 +68,6 @@ antlrcpp::Any SymbolsVisitor::visitProgram(AslParser::ProgramContext *ctx) {
   for (auto ctxFunc : ctx->function()) {
     visit(ctxFunc);
   }
-  // Symbols.print();
   Symbols.popScope();
   DEBUG_EXIT();
   return 0;
@@ -79,22 +78,34 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   std::string funcName = ctx->ID()->getText();
   SymTable::ScopeId sc = Symbols.pushNewScope(funcName);
   putScopeDecor(ctx, sc);
-  Symbols.popScope();
-  
+
   if (ctx->parameters()) visit(ctx->parameters());
+  visit(ctx->declarations());
+  visit(ctx->statements());
+
+  Symbols.popScope();
+
   std::string ident = ctx->ID()->getText();
   if (Symbols.findInCurrentScope(ident)) {
     Errors.declaredIdent(ctx->ID());
   }
+
   else {
     std::vector<TypesMgr::TypeId> lParamsTy;
     TypesMgr::TypeId tRet = Types.createVoidTy();
+
+    if (ctx->returnvalue()) {
+      visit(ctx->returnvalue());
+      TypesMgr::TypeId tbasicRet = getTypeDecor(ctx->returnvalue()->type());
+      if (Types.isIntegerTy(tbasicRet)) tRet = Types.createIntegerTy();
+      else if (Types.isFloatTy(tbasicRet)) tRet = Types.createFloatTy();
+      else if (Types.isBooleanTy(tbasicRet)) tRet = Types.createBooleanTy();
+      else if (Types.isCharacterTy(tbasicRet)) tRet = Types.createCharacterTy();
+    }
     TypesMgr::TypeId tFunc = Types.createFunctionTy(lParamsTy, tRet);
     Symbols.addFunction(ident, tFunc);
   }
-  visit(ctx->declarations());
-  visit(ctx->statements());
-
+  
   DEBUG_EXIT();
   return 0;
 }
@@ -120,9 +131,10 @@ antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx)
 
 antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ctx) {
   DEBUG_ENTER();
-  antlrcpp::Any r = visitChildren(ctx);
+  //antlrcpp::Any r = visitChildren(ctx);
+  visit(ctx->type());
   DEBUG_EXIT();
-  return r;
+  return 0;
 }
 
 antlrcpp::Any SymbolsVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
@@ -260,6 +272,13 @@ antlrcpp::Any SymbolsVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
   return r;
 }
 
+antlrcpp::Any SymbolsVisitor::visitFunCCall(AslParser::FuncCallContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
+
 antlrcpp::Any SymbolsVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
@@ -286,6 +305,9 @@ antlrcpp::Any SymbolsVisitor::visitValue(AslParser::ValueContext *ctx) {
 
 antlrcpp::Any SymbolsVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
+  /*TypesMgr::TypeId t;
+  if (ctx-> expr()) t = createArrayTy();
+  */
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
