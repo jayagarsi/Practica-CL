@@ -117,8 +117,8 @@ expr    : '(' expr ')'                                          # parenthesis
         ;
 
 // Identifiers
-ident   : ID '[' expr ']'
-        | ID
+ident   : ID
+        | ID '[' expr ']'
         ;
 
 //////////////////////////////////////////////////

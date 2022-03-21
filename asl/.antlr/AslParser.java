@@ -1276,19 +1276,19 @@ public class AslParser extends Parser {
 				{
 				setState(196);
 				match(ID);
-				setState(197);
-				match(T__4);
-				setState(198);
-				expr(0);
-				setState(199);
-				match(T__5);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(201);
+				setState(197);
 				match(ID);
+				setState(198);
+				match(T__4);
+				setState(199);
+				expr(0);
+				setState(200);
+				match(T__5);
 				}
 				break;
 			}
@@ -1388,9 +1388,9 @@ public class AslParser extends Parser {
 		"\7\u00be\u00bf\f\5\2\2\u00bf\u00c0\7\24\2\2\u00c0\u00c2\5\34\17\6\u00c1"+
 		"\u00b2\3\2\2\2\u00c1\u00b5\3\2\2\2\u00c1\u00b8\3\2\2\2\u00c1\u00bb\3\2"+
 		"\2\2\u00c1\u00be\3\2\2\2\u00c2\u00c5\3\2\2\2\u00c3\u00c1\3\2\2\2\u00c3"+
-		"\u00c4\3\2\2\2\u00c4\35\3\2\2\2\u00c5\u00c3\3\2\2\2\u00c6\u00c7\7-\2\2"+
-		"\u00c7\u00c8\7\7\2\2\u00c8\u00c9\5\34\17\2\u00c9\u00ca\7\b\2\2\u00ca\u00cd"+
-		"\3\2\2\2\u00cb\u00cd\7-\2\2\u00cc\u00c6\3\2\2\2\u00cc\u00cb\3\2\2\2\u00cd"+
+		"\u00c4\3\2\2\2\u00c4\35\3\2\2\2\u00c5\u00c3\3\2\2\2\u00c6\u00cd\7-\2\2"+
+		"\u00c7\u00c8\7-\2\2\u00c8\u00c9\7\7\2\2\u00c9\u00ca\5\34\17\2\u00ca\u00cb"+
+		"\7\b\2\2\u00cb\u00cd\3\2\2\2\u00cc\u00c6\3\2\2\2\u00cc\u00c7\3\2\2\2\u00cd"+
 		"\37\3\2\2\2\23#+/>GPXhkp~\u0090\u009e\u00b0\u00c1\u00c3\u00cc";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());

@@ -79,6 +79,9 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   SymTable::ScopeId sc = Symbols.pushNewScope(funcName);
   putScopeDecor(ctx, sc);
 
+  if (funcName == "main" && ctx->parameters())
+    Errors.noMainProperlyDeclared(ctx);
+
   if (ctx->parameters()) visit(ctx->parameters());
   visit(ctx->declarations());
   visit(ctx->statements());
@@ -309,9 +312,6 @@ antlrcpp::Any SymbolsVisitor::visitValue(AslParser::ValueContext *ctx) {
 
 antlrcpp::Any SymbolsVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
-  /*TypesMgr::TypeId t;
-  if (ctx-> expr()) t = createArrayTy();
-  */
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;

@@ -192,6 +192,7 @@ antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   if (not Types.isFunctionTy(t1) and not Types.isErrorTy(t1)) {
     Errors.isNotCallable(ctx->ident());
   }
+  if (ctx->paramexp()) visit(ctx->paramexp());
   DEBUG_EXIT();
   return 0;
 }
@@ -250,11 +251,16 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
   TypesMgr::TypeId t = getTypeDecor(ctx->ident());
+
+  if (not Types.isFunctionTy(t) and not Types.isErrorTy(t)) 
+    Errors.isNotCallable(ctx->ident());
+  
   bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, b);
   DEBUG_EXIT();
   return 0;
+  // CAL REVISAR
 }
 
 antlrcpp::Any TypeCheckVisitor::visitUnary(AslParser::UnaryContext *ctx) {
@@ -374,26 +380,27 @@ antlrcpp::Any TypeCheckVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx)
 antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
   std::string ident = ctx->ID()->getText();
-  if (Symbols.findInStack(ident) == -1) {
+  if (Symbols.findInStack(ident) == -1) {               // si el simbol no es troba en la pila error
     Errors.undeclaredIdent(ctx->ID());
     TypesMgr::TypeId te = Types.createErrorTy();
     putTypeDecor(ctx, te);
     putIsLValueDecor(ctx, true);
   }
-  else {
+  else {                                                // altrament
     TypesMgr::TypeId t1 = Symbols.getType(ident);
 
-    if(Types.isFunctionTy(t1)){
+    if(Types.isFunctionTy(t1)) {                        // si es de tipus funcio obtenim el valor de retorn
       t1 = Types.getFuncReturnType(t1);
     }
-    if (ctx->expr()) {
+
+    if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
       if (not Types.isArrayTy(t1)) {
         Errors.nonArrayInArrayAccess(ctx);
         t1 = Types.createErrorTy();
       }
       visit(ctx->expr());
       TypesMgr::TypeId t = getTypeDecor(ctx->expr());
-      if (not Types.isIntegerTy(t)) {
+      if (not Types.isIntegerTy(t)) {                       // si l'acces no es de tipus enter error
         Errors.nonIntegerIndexInArrayAccess(ctx->expr());
         t = Types.createErrorTy();
       }
