@@ -76,6 +76,7 @@ antlrcpp::Any TypeCheckVisitor::visitProgram(AslParser::ProgramContext *ctx) {
   }
   if (Symbols.noMainProperlyDeclared())
     Errors.noMainProperlyDeclared(ctx);
+
   Symbols.popScope();
   Errors.print();
   DEBUG_EXIT();
@@ -151,7 +152,7 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
 
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableLeftExpr(ctx->left_expr());
-   
+
   DEBUG_EXIT();
   return 0;
 }
@@ -168,7 +169,7 @@ antlrcpp::Any TypeCheckVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   if (ctx->ELSE()) visit(ctx->statements(1));
 
   DEBUG_EXIT();
-  return 0;      
+  return 0;
 }
 
 antlrcpp::Any TypeCheckVisitor::visitWhileStmt(AslParser::WhileStmtContext *ctx) {
@@ -252,9 +253,9 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   visit(ctx->ident());
   TypesMgr::TypeId t = getTypeDecor(ctx->ident());
 
-  if (not Types.isFunctionTy(t) and not Types.isErrorTy(t)) 
+  if ((not Types.isFunctionTy(t) or Types.isVoidFunction(t)) and not Types.isErrorTy(t))
     Errors.isNotCallable(ctx->ident());
-  
+
   bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, b);

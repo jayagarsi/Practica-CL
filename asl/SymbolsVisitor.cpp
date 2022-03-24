@@ -79,47 +79,46 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   SymTable::ScopeId sc = Symbols.pushNewScope(funcName);
   putScopeDecor(ctx, sc);
 
-  if (funcName == "main" && ctx->parameters())
-    Errors.noMainProperlyDeclared(ctx);
-
-  if (ctx->parameters()) visit(ctx->parameters());
-  visit(ctx->declarations());
-  visit(ctx->statements());
-
-  Symbols.popScope();
-
   std::string ident = ctx->ID()->getText();
-  if (Symbols.findInCurrentScope(ident)) {
+  Symbols.popScope();                         // cal esborrar l'scope local per comprovar si la funcio
+  if (Symbols.findInCurrentScope(ident)) {    // funcName es troba en l'scope global
     Errors.declaredIdent(ctx->ID());
   }
 
   else {
-    std::vector<TypesMgr::TypeId> lParamsTy;
+    Symbols.pushThisScope(sc);                // si funcName no es troba en l'scope global hem de tornar a afegir el
+    std::vector<TypesMgr::TypeId> lParamsTy;  // a carregar l'scope local per poder afegir la funcio al global i visitar els parametres i tal
     TypesMgr::TypeId tRet = Types.createVoidTy();
+
+    if (ctx->parameters()) {
+      visit(ctx->parameters());
+      for (auto & oneParam : ctx->parameters()->ID()) {
+          lParamsTy.push_back(Symbols.getLocalSymbolType(funcName, oneParam->getText()));
+      }
+    }
 
     if (ctx->returnvalue()) {
       visit(ctx->returnvalue());
-      TypesMgr::TypeId tbasicRet = getTypeDecor(ctx->returnvalue()->type());
-      if (Types.isIntegerTy(tbasicRet)) tRet = Types.createIntegerTy();
-      else if (Types.isFloatTy(tbasicRet)) tRet = Types.createFloatTy();
-      else if (Types.isBooleanTy(tbasicRet)) tRet = Types.createBooleanTy();
-      else if (Types.isCharacterTy(tbasicRet)) tRet = Types.createCharacterTy();
-     
-      
+      tRet = getTypeDecor(ctx->returnvalue()->type());
     }
+
+    visit(ctx->declarations());
+    visit(ctx->statements());
+
+    Symbols.popScope();
     TypesMgr::TypeId tFunc = Types.createFunctionTy(lParamsTy, tRet);
     //cout << tFunc << " funcion del tipo " << tRet << endl;
-    Symbols.addFunction(ident, tFunc);
 
+    Symbols.addFunction(ident, tFunc);
   }
-  
+
   DEBUG_EXIT();
   return 0;
 }
 
 antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx) {
   DEBUG_ENTER();
-
+  std::vector<TypesMgr::TypeId> lParamsTy;
   for (uint i = 0; i < ctx->ID().size(); ++i) {
     visit(ctx->type(i));
     std::string ident = ctx->ID(i)->getText();
@@ -129,11 +128,12 @@ antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx)
     else {
       TypesMgr::TypeId t = getTypeDecor(ctx->type(i));
       Symbols.addParameter(ident, t);
+      lParamsTy.push_back(t);
     }
   }
 
   DEBUG_EXIT();
-  return 0;
+  return lParamsTy;
 }
 
 antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ctx) {
@@ -179,7 +179,7 @@ antlrcpp::Any SymbolsVisitor::visitBasictype(AslParser::BasictypeContext *ctx) {
   else if (ctx->BOOL()) t = Types.createBooleanTy();
   else if (ctx->CHAR()) t = Types.createCharacterTy();
   else t = Types.createErrorTy();
-  
+
   putTypeDecor(ctx, t);
   DEBUG_EXIT();
   return 0;
