@@ -88,8 +88,12 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   SymTable::ScopeId sc = getScopeDecor(ctx);
   Symbols.pushThisScope(sc);
   // Symbols.print();
+  setCurrentFunctionTy(Types.createVoidTy());
   if(ctx->parameters()) visit(ctx->parameters());
-  if(ctx->returnvalue()) visit(ctx->returnvalue());
+  if(ctx->returnvalue()) {
+    visit(ctx->returnvalue());
+    setCurrentFunctionTy(getTypeDecor(ctx->returnvalue()->type()));
+  }
   visit(ctx->declarations());
   visit(ctx->statements());
   Symbols.popScope();
@@ -144,18 +148,22 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   visit(ctx->left_expr());
   visit(ctx->expr());
 
-  TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
-  TypesMgr::TypeId t2 = getTypeDecor(ctx->expr());
+  TypesMgr::TypeId tlexpr = getTypeDecor(ctx->left_expr());
+  TypesMgr::TypeId trexpr = getTypeDecor(ctx->expr());
 
-  if(not Types.isErrorTy(t2) and Types.isFunctionTy(t2) and not Types.isVoidTy(t2)) 
-      t2 = Types.getFuncReturnType(t2);
-  if((not Types.isErrorTy(t2)) and (Types.isVoidTy(t2))) 
-      Errors.isNotFunction(ctx->expr());
-  else if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
-      (not Types.copyableTypes(t1, t2)))
-    Errors.incompatibleAssignment(ctx->ASSIGN());
+  if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
+    trexpr = Types.getFuncReturnType(trexpr);
 
-  if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
+  if (not Types.isErrorTy(trexpr) and Types.isVoidTy(trexpr))
+    Errors.isNotFunction(ctx->expr());
+
+  else if ((not Types.isErrorTy(tlexpr)) and (not Types.isErrorTy(trexpr)) and
+      (not Types.copyableTypes(tlexpr, trexpr))) {
+        Errors.incompatibleAssignment(ctx->ASSIGN());
+        //t1 = Types.createErrorTy();
+        //putTypeDecor(ctx->left_expr(), t1);
+  }
+  if ((not Types.isErrorTy(tlexpr)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableLeftExpr(ctx->left_expr());
 
   DEBUG_EXIT();
@@ -194,10 +202,25 @@ antlrcpp::Any TypeCheckVisitor::visitWhileStmt(AslParser::WhileStmtContext *ctx)
 antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
-  TypesMgr::TypeId t = getTypeDecor(ctx->ident());
-  if(not Types.isErrorTy(t)  and not Types.isFunctionTy(t))
+  visit(ctx->paramexp());
+  TypesMgr::TypeId tf = getTypeDecor(ctx->ident());
+  if(not Types.isErrorTy(tf) and not Types.isFunctionTy(tf) and not Types.isVoidFunction(tf))
     Errors.isNotCallable(ctx->ident()); 
-  if (ctx->paramexp()) visit(ctx->paramexp());
+  
+  else {
+    if (Types.getNumOfParameters(tf) != (ctx->paramexp()->expr()).size())
+      Errors.numberOfParameters(ctx);
+
+    else {
+      auto funcParams = Types.getFuncParamsTypes(tf);
+      for (uint i = 0; i < (ctx->paramexp()->expr()).size(); ++i) {
+        TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
+        if (texpr != funcParams[i])
+          Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
+      }
+    }
+  }
+
   DEBUG_EXIT();
   return 0;
 }
@@ -205,6 +228,20 @@ antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
 antlrcpp::Any TypeCheckVisitor::visitReturnStmt(AslParser::ReturnStmtContext *ctx) {
   DEBUG_ENTER();
 
+  TypesMgr::TypeId t = getCurrentFunctionTy();
+
+  if (ctx->expr()) {
+    visit(ctx->expr());
+    TypesMgr::TypeId texpr = getTypeDecor(ctx->expr());
+
+    if(not Types.isErrorTy(t) and not Types.isErrorTy(texpr)
+        and not Types.copyableTypes(t, texpr))
+      Errors.incompatibleReturn(ctx->RETURN());
+  } 
+  else {
+    if (not Types.isErrorTy(t) and not Types.isVoidTy(t))
+      Errors.incompatibleReturn(ctx->RETURN());
+  }
   DEBUG_EXIT();
   return 0;
 }
@@ -216,7 +253,8 @@ antlrcpp::Any TypeCheckVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   if ((not Types.isErrorTy(t1)) and (not Types.isPrimitiveTy(t1)) and
       (not Types.isFunctionTy(t1)) and (not (ctx->left_expr()->ident()->expr()))){
     Errors.readWriteRequireBasic(ctx);
-      }
+  }
+  
   else if(not Types.isErrorTy(t1) and Types.isArrayTy(t1) and 
       (ctx->left_expr()->ident()->expr()) and not Types.isPrimitiveTy(Types.getArrayElemType(t1)))
       Errors.readWriteRequireBasic(ctx);
@@ -259,15 +297,33 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
   visit(ctx->paramexp());
-  TypesMgr::TypeId t = getTypeDecor(ctx->ident());  
-  if( (not Types.isErrorTy(t)) and (not Types.isFunctionTy(t))) 
-      Errors.isNotCallable(ctx->ident());
+  TypesMgr::TypeId tf = getTypeDecor(ctx->ident());
+
+  if(not Types.isErrorTy(tf) and not Types.isFunctionTy(tf)) 
+    Errors.isNotCallable(ctx->ident());
+
+  else {
+    if (Types.getNumOfParameters(tf) != (ctx->paramexp()->expr()).size())
+      Errors.numberOfParameters(ctx);
+    else {
+      auto funcParams = Types.getFuncParamsTypes(tf);
+      for (uint i = 0; i < (ctx->paramexp()->expr()).size(); ++i) {
+        TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
+        cout << texpr << " " << funcParams[i] << "     ";
+
+        if (texpr != funcParams[i])
+          Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
+      }
+      cout << endl;
+    }
+  }
+
+  if (Types.isFunctionTy(tf)) tf = Types.getFuncReturnType(tf);
   bool b = getIsLValueDecor(ctx->ident());
-  putTypeDecor(ctx, t);
+  putTypeDecor(ctx, tf);
   putIsLValueDecor(ctx, b);
   DEBUG_EXIT();
   return 0;
-  // CAL REVISAR
 }
 
 antlrcpp::Any TypeCheckVisitor::visitUnary(AslParser::UnaryContext *ctx) {
@@ -299,7 +355,6 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
   TypesMgr::TypeId t1 = getTypeDecor(ctx->expr(0));
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
-  cout << t1 << " " << t2 << endl;
 
   if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
       ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
@@ -397,10 +452,6 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   else {                                                // altrament
     TypesMgr::TypeId t1 = Symbols.getType(ident);
 
-    // if(Types.isFunctionTy(t1) and not Types.isVoidTy(t1)) {                        // si es de tipus funcio obtenim el valor de retorn
-    //   t1 = Types.getFuncReturnType(t1);
-    // }
-
     if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
       if (not Types.isArrayTy(t1)) {
         Errors.nonArrayInArrayAccess(ctx);
@@ -410,8 +461,10 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
       TypesMgr::TypeId t = getTypeDecor(ctx->expr());
       if (not Types.isIntegerTy(t)) {                       // si l'acces no es de tipus enter error
         Errors.nonIntegerIndexInArrayAccess(ctx->expr());
-        t = Types.createErrorTy();
+        t1 = Types.createErrorTy();
       }
+      if (not Types.isErrorTy(t1))
+        t1 = Types.getArrayElemType(t1);
     }
     putTypeDecor(ctx, t1);
     if (Symbols.isFunctionClass(ident))
