@@ -141,12 +141,17 @@ antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ct
 
 antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
   DEBUG_ENTER();
-
   visit(ctx->left_expr());
   visit(ctx->expr());
+
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr());
-  if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
+
+  if(not Types.isErrorTy(t2) and Types.isFunctionTy(t2) and not Types.isVoidTy(t2)) 
+      t2 = Types.getFuncReturnType(t2);
+  if((not Types.isErrorTy(t2)) and (Types.isVoidTy(t2))) 
+      Errors.isNotFunction(ctx->expr());
+  else if ((not Types.isErrorTy(t1)) and (not Types.isErrorTy(t2)) and
       (not Types.copyableTypes(t1, t2)))
     Errors.incompatibleAssignment(ctx->ASSIGN());
 
@@ -189,10 +194,9 @@ antlrcpp::Any TypeCheckVisitor::visitWhileStmt(AslParser::WhileStmtContext *ctx)
 antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
-  TypesMgr::TypeId t1 = getTypeDecor(ctx->ident());
-  if (not Types.isFunctionTy(t1) and not Types.isErrorTy(t1)) {
-    Errors.isNotCallable(ctx->ident());
-  }
+  TypesMgr::TypeId t = getTypeDecor(ctx->ident());
+  if(not Types.isErrorTy(t)  and not Types.isFunctionTy(t))
+    Errors.isNotCallable(ctx->ident()); 
   if (ctx->paramexp()) visit(ctx->paramexp());
   DEBUG_EXIT();
   return 0;
@@ -210,10 +214,13 @@ antlrcpp::Any TypeCheckVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   visit(ctx->left_expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
   if ((not Types.isErrorTy(t1)) and (not Types.isPrimitiveTy(t1)) and
-      (not Types.isFunctionTy(t1)) ){
+      (not Types.isFunctionTy(t1)) and (not (ctx->left_expr()->ident()->expr()))){
     Errors.readWriteRequireBasic(ctx);
-    cout << ctx->left_expr()->ident()->ID()->getText() << " " << t1 << endl;
       }
+  else if(not Types.isErrorTy(t1) and Types.isArrayTy(t1) and 
+      (ctx->left_expr()->ident()->expr()) and not Types.isPrimitiveTy(Types.getArrayElemType(t1)))
+      Errors.readWriteRequireBasic(ctx);
+
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableExpression(ctx);
   DEBUG_EXIT();
@@ -251,11 +258,10 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
 antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
-  TypesMgr::TypeId t = getTypeDecor(ctx->ident());
-
-  if ((not Types.isFunctionTy(t) or Types.isVoidFunction(t)) and not Types.isErrorTy(t))
-    Errors.isNotCallable(ctx->ident());
-
+  visit(ctx->paramexp());
+  TypesMgr::TypeId t = getTypeDecor(ctx->ident());  
+  if( (not Types.isErrorTy(t)) and (not Types.isFunctionTy(t))) 
+      Errors.isNotCallable(ctx->ident());
   bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, b);
@@ -293,6 +299,7 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
   TypesMgr::TypeId t1 = getTypeDecor(ctx->expr(0));
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
+  cout << t1 << " " << t2 << endl;
 
   if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
       ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
@@ -390,9 +397,9 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   else {                                                // altrament
     TypesMgr::TypeId t1 = Symbols.getType(ident);
 
-    if(Types.isFunctionTy(t1)) {                        // si es de tipus funcio obtenim el valor de retorn
-      t1 = Types.getFuncReturnType(t1);
-    }
+    // if(Types.isFunctionTy(t1) and not Types.isVoidTy(t1)) {                        // si es de tipus funcio obtenim el valor de retorn
+    //   t1 = Types.getFuncReturnType(t1);
+    // }
 
     if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
       if (not Types.isArrayTy(t1)) {
