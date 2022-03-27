@@ -136,6 +136,14 @@ antlrcpp::Any TypeCheckVisitor::visitArraytype(AslParser::ArraytypeContext *ctx)
   return r;
 }
 
+antlrcpp::Any TypeCheckVisitor::visitParamexp(AslParser::ParamexpContext *ctx) {
+  DEBUG_ENTER();
+  antlrcpp::Any r = visitChildren(ctx);
+  DEBUG_EXIT();
+  return r;
+}
+
+
 antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ctx) {
   DEBUG_ENTER();
   visitChildren(ctx);
@@ -423,7 +431,7 @@ antlrcpp::Any TypeCheckVisitor::visitBoolean(AslParser::BooleanContext *ctx) {
 
 antlrcpp::Any TypeCheckVisitor::visitValue(AslParser::ValueContext *ctx) {
   DEBUG_ENTER();
-    TypesMgr::TypeId t;
+  TypesMgr::TypeId t;
 
   if (ctx->INTVAL()) t = Types.createIntegerTy();
   else if (ctx->FLOATNUM()) t = Types.createFloatTy();
@@ -458,23 +466,23 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
     putIsLValueDecor(ctx, true);
   }
   else {                                                // altrament
-    TypesMgr::TypeId t1 = Symbols.getType(ident);
+    TypesMgr::TypeId ti = Symbols.getType(ident);
 
     if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
-      if (not Types.isArrayTy(t1)) {
+      if (not Types.isArrayTy(ti)) {
         Errors.nonArrayInArrayAccess(ctx);
-        t1 = Types.createErrorTy();
+        ti = Types.createErrorTy();
       }
       visit(ctx->expr());
-      TypesMgr::TypeId t = getTypeDecor(ctx->expr());
-      if (not Types.isIntegerTy(t)) {                       // si l'acces no es de tipus enter error
+      TypesMgr::TypeId taccess = getTypeDecor(ctx->expr());
+      if (not Types.isIntegerTy(taccess)) {                       // si l'acces no es de tipus enter error
         Errors.nonIntegerIndexInArrayAccess(ctx->expr());
-        t1 = Types.createErrorTy();
+        ti = Types.createErrorTy();
       }
-      if (not Types.isErrorTy(t1))
-        t1 = Types.getArrayElemType(t1);
+      if (not Types.isErrorTy(ti))
+        ti = Types.getArrayElemType(ti);
     }
-    putTypeDecor(ctx, t1);
+    putTypeDecor(ctx, ti);
     if (Symbols.isFunctionClass(ident))
       putIsLValueDecor(ctx, false);
     else
