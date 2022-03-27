@@ -303,18 +303,21 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
     Errors.isNotCallable(ctx->ident());
 
   else {
-    if (Types.getNumOfParameters(tf) != (ctx->paramexp()->expr()).size())
+    auto numCallParameters = (ctx->paramexp()->expr()).size();
+
+    if (Types.getNumOfParameters(tf) != numCallParameters)
       Errors.numberOfParameters(ctx);
+
     else {
       auto funcParams = Types.getFuncParamsTypes(tf);
-      for (uint i = 0; i < (ctx->paramexp()->expr()).size(); ++i) {
+      for (uint i = 0; i < numCallParameters; ++i) {
         TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
-        cout << texpr << " " << funcParams[i] << "     ";
+        //cout << texpr << " " << funcParams[i] << "     ";
 
         if (texpr != funcParams[i])
           Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
       }
-      cout << endl;
+      //cout << endl;
     }
   }
 
@@ -356,14 +359,23 @@ antlrcpp::Any TypeCheckVisitor::visitArithmetic(AslParser::ArithmeticContext *ct
   visit(ctx->expr(1));
   TypesMgr::TypeId t2 = getTypeDecor(ctx->expr(1));
 
-  if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
-      ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
-    Errors.incompatibleOperator(ctx->op);
-
   TypesMgr::TypeId t;
 
-  if (Types.isFloatTy(t1) or Types.isFloatTy(t2)) t = Types.createFloatTy();
-  else t = Types.createIntegerTy();
+  if (ctx->MOD()) {
+    if (((not Types.isErrorTy(t1)) and (not Types.isIntegerTy(t1))) or
+      ((not Types.isErrorTy(t2)) and (not Types.isIntegerTy(t2))))
+    Errors.incompatibleOperator(ctx->op);
+    t = Types.createIntegerTy();
+  }
+
+  else {
+    if (((not Types.isErrorTy(t1)) and (not Types.isNumericTy(t1))) or
+        ((not Types.isErrorTy(t2)) and (not Types.isNumericTy(t2))))
+      Errors.incompatibleOperator(ctx->op);
+
+    if (Types.isFloatTy(t1) or Types.isFloatTy(t2)) t = Types.createFloatTy();
+    else t = Types.createIntegerTy();
+  }
 
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, false);
@@ -401,11 +413,7 @@ antlrcpp::Any TypeCheckVisitor::visitBoolean(AslParser::BooleanContext *ctx) {
     if ( (not Types.isBooleanTy(t1)) or (not Types.isBooleanTy(t2)) )
       Errors.incompatibleOperator(ctx->op);
   }
-/*
-  if ((not Types.isErrorTy(t1) and (not Types.isErrorTy(t2))) and
-      ((not Types.isErrorTy(t1)) or (not Types.isBooleanTy(t2))))
-    Errors.incompatibleOperator(ctx->op);
-  */
+
   TypesMgr::TypeId t = Types.createBooleanTy();
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, false);
