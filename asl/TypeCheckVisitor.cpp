@@ -94,7 +94,6 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
     visit(ctx->returnvalue());
     setCurrentFunctionTy(getTypeDecor(ctx->returnvalue()->type()));
   }
-  visit(ctx->declarations());
   visit(ctx->statements());
   Symbols.popScope();
   DEBUG_EXIT();
@@ -159,18 +158,28 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   TypesMgr::TypeId tlexpr = getTypeDecor(ctx->left_expr());
   TypesMgr::TypeId trexpr = getTypeDecor(ctx->expr());
 
-  if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
-    trexpr = Types.getFuncReturnType(trexpr);
+  TypesMgr::TypeId tflexpr = tlexpr;
+  TypesMgr::TypeId tfrexpr = trexpr;
 
-  if (not Types.isErrorTy(trexpr) and Types.isVoidTy(trexpr))
-    Errors.isNotFunction(ctx->expr());
+  bool error = false;
 
-  else if ((not Types.isErrorTy(tlexpr)) and (not Types.isErrorTy(trexpr)) and
-      (not Types.copyableTypes(tlexpr, trexpr))) {
+  if (not Types.isErrorTy(tlexpr) and Types.isFunctionTy(trexpr))
+    tlexpr = Types.getFuncReturnType(trexpr);
+
+  if (not Types.isErrorTy(tlexpr) and Types.isFunctionTy(trexpr))
+    trexpr = Types.getFuncReturnType(trexpr); 
+
+  if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr) and
+      not Types.copyableTypes(tlexpr, trexpr)) {
+        error = true;
         Errors.incompatibleAssignment(ctx->ASSIGN());
-        //t1 = Types.createErrorTy();
-        //putTypeDecor(ctx->left_expr(), t1);
   }
+
+  if (not error and not Types.isErrorTy(tfrexpr) and 
+      Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)) {
+      Errors.isNotFunction(ctx->expr());
+  }
+
   if ((not Types.isErrorTy(tlexpr)) and (not getIsLValueDecor(ctx->left_expr())))
     Errors.nonReferenceableLeftExpr(ctx->left_expr());
 
@@ -212,22 +221,28 @@ antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   visit(ctx->ident());
   visit(ctx->paramexp());
   TypesMgr::TypeId tf = getTypeDecor(ctx->ident());
-  if(not Types.isErrorTy(tf) and not Types.isFunctionTy(tf) and not Types.isVoidFunction(tf))
-    Errors.isNotCallable(ctx->ident()); 
-  
-  else {
-    if (Types.getNumOfParameters(tf) != (ctx->paramexp()->expr()).size())
+  if (not Types.isErrorTy(tf) and not Types.isFunctionTy(tf))
+    Errors.isNotCallable(ctx->ident());
+
+  else if (not Types.isErrorTy(tf) and Types.isFunctionTy(tf)) {          // si es tipus error vol dir que l'ID ja esta declarat
+    auto numCallParameters = (ctx->paramexp()->expr()).size();            // per tant no podem mirar si te paramatres
+    if (Types.getNumOfParameters(tf) != numCallParameters)
       Errors.numberOfParameters(ctx);
 
     else {
+
       auto funcParams = Types.getFuncParamsTypes(tf);
-      for (uint i = 0; i < (ctx->paramexp()->expr()).size(); ++i) {
+      for (uint i = 0; i < numCallParameters; ++i) {
         TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
-        if (texpr != funcParams[i])
+        if (not Types.copyableTypes(funcParams[i], texpr))
           Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
       }
+
     }
   }
+  bool b = getIsLValueDecor(ctx->ident());
+  putTypeDecor(ctx, tf);
+  putIsLValueDecor(ctx, b);
 
   DEBUG_EXIT();
   return 0;
@@ -241,11 +256,10 @@ antlrcpp::Any TypeCheckVisitor::visitReturnStmt(AslParser::ReturnStmtContext *ct
   if (ctx->expr()) {
     visit(ctx->expr());
     TypesMgr::TypeId texpr = getTypeDecor(ctx->expr());
-
     if(not Types.isErrorTy(t) and not Types.isErrorTy(texpr)
         and not Types.copyableTypes(t, texpr))
       Errors.incompatibleReturn(ctx->RETURN());
-  } 
+  }
   else {
     if (not Types.isErrorTy(t) and not Types.isVoidTy(t))
       Errors.incompatibleReturn(ctx->RETURN());
@@ -262,8 +276,8 @@ antlrcpp::Any TypeCheckVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
       (not Types.isFunctionTy(t1)) and (not (ctx->left_expr()->ident()->expr()))){
     Errors.readWriteRequireBasic(ctx);
   }
-  
-  else if(not Types.isErrorTy(t1) and Types.isArrayTy(t1) and 
+
+  else if(not Types.isErrorTy(t1) and Types.isArrayTy(t1) and
       (ctx->left_expr()->ident()->expr()) and not Types.isPrimitiveTy(Types.getArrayElemType(t1)))
       Errors.readWriteRequireBasic(ctx);
 
@@ -307,11 +321,11 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   visit(ctx->paramexp());
   TypesMgr::TypeId tf = getTypeDecor(ctx->ident());
 
-  if(not Types.isErrorTy(tf) and not Types.isFunctionTy(tf)) 
+  if(not Types.isErrorTy(tf) and not Types.isFunctionTy(tf))
     Errors.isNotCallable(ctx->ident());
 
-  else {
-    auto numCallParameters = (ctx->paramexp()->expr()).size();
+  else if (not Types.isErrorTy(tf) and Types.isFunctionTy(tf)) {      // si es tipus error vol dir que l'ID ja esta declarat
+    auto numCallParameters = (ctx->paramexp()->expr()).size();        // per tant no podem mirar si te paramatres
 
     if (Types.getNumOfParameters(tf) != numCallParameters)
       Errors.numberOfParameters(ctx);
@@ -320,16 +334,14 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
       auto funcParams = Types.getFuncParamsTypes(tf);
       for (uint i = 0; i < numCallParameters; ++i) {
         TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
-        //cout << texpr << " " << funcParams[i] << "     ";
 
-        if (texpr != funcParams[i])
+        if (not Types.copyableTypes(funcParams[i], texpr))
           Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
       }
-      //cout << endl;
     }
   }
 
-  if (Types.isFunctionTy(tf)) tf = Types.getFuncReturnType(tf);
+  if (Types.isFunctionTy(tf) and not Types.isVoidFunction(tf)) tf = Types.getFuncReturnType(tf);
   bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, tf);
   putIsLValueDecor(ctx, b);
@@ -467,7 +479,6 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   }
   else {                                                // altrament
     TypesMgr::TypeId ti = Symbols.getType(ident);
-
     if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
       if (not Types.isArrayTy(ti)) {
         Errors.nonArrayInArrayAccess(ctx);
