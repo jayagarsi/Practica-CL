@@ -1,8 +1,0 @@
-1) Fragment MULTID o multid?
-2) statementelse per else? truskis o no
-3) rule function contains an optional block with 
-at least one alternative that can match an empty string (problema?) idem amb token
-4) diferencia entre fer token o regla
-5) f(3,e) != f(3, e) solucio?       (jp_chkt_10)
-6) violacio de segment vol dir que no hi ha errors sintactics o lexics?
-7) line 14:7 no viable alternative at input 'vara,' (WTF) (jp_chkt_20)
