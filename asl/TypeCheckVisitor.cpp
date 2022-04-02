@@ -161,23 +161,23 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   TypesMgr::TypeId tflexpr = tlexpr;
   TypesMgr::TypeId tfrexpr = trexpr;
 
-  bool error = false;
-
   if (not Types.isErrorTy(tlexpr) and Types.isFunctionTy(trexpr))
     tlexpr = Types.getFuncReturnType(trexpr);
 
-  if (not Types.isErrorTy(tlexpr) and Types.isFunctionTy(trexpr))
+  if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
     trexpr = Types.getFuncReturnType(trexpr); 
 
-  if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr) and
-      not Types.copyableTypes(tlexpr, trexpr)) {
-        error = true;
-        Errors.incompatibleAssignment(ctx->ASSIGN());
-  }
+  if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr)){
+    if (Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)
+        and ctx->expr()->getText().find('(') < (ctx->expr()->getText()).size()){
+           Errors.isNotFunction(ctx->expr());
+        }
+    else if((Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr))
+    || not Types.copyableTypes(tlexpr, trexpr)){
+          Errors.incompatibleAssignment(ctx->ASSIGN());
 
-  if (not error and not Types.isErrorTy(tfrexpr) and 
-      Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)) {
-      Errors.isNotFunction(ctx->expr());
+    }
+    
   }
 
   if ((not Types.isErrorTy(tlexpr)) and (not getIsLValueDecor(ctx->left_expr())))
