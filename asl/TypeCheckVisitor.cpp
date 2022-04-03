@@ -167,6 +167,9 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
     trexpr = Types.getFuncReturnType(trexpr); 
 
+   cout << ctx->left_expr()->getText() << " " << Types.to_string(tlexpr) << " ";
+    cout << ctx->expr()->getText() << " " << Types.to_string(trexpr) << " " << endl;
+
   if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr)){
     if (Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)
         and ctx->expr()->getText().find('(') < (ctx->expr()->getText()).size()){
@@ -488,7 +491,7 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
       TypesMgr::TypeId taccess = getTypeDecor(ctx->expr());
       if (not Types.isIntegerTy(taccess)) {                       // si l'acces no es de tipus enter error
         Errors.nonIntegerIndexInArrayAccess(ctx->expr());
-        ti = Types.createErrorTy();
+
       }
       if (not Types.isErrorTy(ti))
         ti = Types.getArrayElemType(ti);
