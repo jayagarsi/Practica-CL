@@ -158,7 +158,6 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   TypesMgr::TypeId tlexpr = getTypeDecor(ctx->left_expr());
   TypesMgr::TypeId trexpr = getTypeDecor(ctx->expr());
 
-  TypesMgr::TypeId tflexpr = tlexpr;
   TypesMgr::TypeId tfrexpr = trexpr;
 
   if (not Types.isErrorTy(tlexpr) and Types.isFunctionTy(trexpr))
@@ -167,14 +166,11 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
   if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
     trexpr = Types.getFuncReturnType(trexpr); 
 
-   cout << ctx->left_expr()->getText() << " " << Types.to_string(tlexpr) << " ";
-    cout << ctx->expr()->getText() << " " << Types.to_string(trexpr) << " " << endl;
-
   if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr)){
     if (Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)
-        and ctx->expr()->getText().find('(') < (ctx->expr()->getText()).size()){
+        and ctx->expr()->getText().find('(') < (ctx->expr()->getText()).size())   // si hi ha un parentesis es que es una crida a funcio
            Errors.isNotFunction(ctx->expr());
-        }
+
     else if((Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr))
     || not Types.copyableTypes(tlexpr, trexpr)){
           Errors.incompatibleAssignment(ctx->ASSIGN());
