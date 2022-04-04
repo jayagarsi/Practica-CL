@@ -112,7 +112,7 @@ expr    : '(' expr ')'                                          # parenthesis
         | expr op=(LET|LEQ|EQUAL|NEQ|GET|GEQ) expr              # relational
         | expr op=AND expr                                      # boolean
         | expr op=OR expr                                       # boolean
-        | (INTVAL | FLOATNUM | BOOLVAL | CHAREXPR)              # value
+        | (INTVAL | FLOATNUM | BOOLVAL | CHAREXPR | CHARVAL)    # value
         | ident                                                 # exprIdent
         ;
 
@@ -177,6 +177,8 @@ STRING    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ;
 
 fragment
 ESC_SEQ   : '\\' ('b'|'t'|'n'|'f'|'r'|'"'|'\''|'\\') ;
+
+CHARVAL   : '\'' ( ESC_SEQ | ~('\\'|'\'') ) '\'' ;
 
 // Comments (inline C++-style)
 COMMENT   : '//' ~('\n'|'\r')* '\r'? '\n' -> skip ;
