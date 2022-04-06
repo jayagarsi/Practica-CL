@@ -444,11 +444,12 @@ antlrcpp::Any TypeCheckVisitor::visitValue(AslParser::ValueContext *ctx) {
   DEBUG_ENTER();
   TypesMgr::TypeId t;
 
-  if (ctx->INTVAL()) t = Types.createIntegerTy();
+  if (ctx->INTVAL())        t = Types.createIntegerTy();
   else if (ctx->FLOATNUM()) t = Types.createFloatTy();
   else if (ctx->CHAREXPR()) t = Types.createCharacterTy();
-  else if (ctx->BOOLVAL()) t = Types.createBooleanTy();
-  else t = Types.createErrorTy();
+  else if (ctx->CHARVAL())  t = Types.createCharacterTy();
+  else if (ctx->BOOLVAL())  t = Types.createBooleanTy();
+  else                      t = Types.createErrorTy();
 
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, false);
