@@ -233,7 +233,7 @@ antlrcpp::Any TypeCheckVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
       auto funcParams = Types.getFuncParamsTypes(tf);
       for (uint i = 0; i < numCallParameters; ++i) {
         TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
-        if (not Types.copyableTypes(funcParams[i], texpr))
+        if (not Types.isErrorTy(texpr) and not Types.copyableTypes(funcParams[i], texpr))
           Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
       }
 
@@ -334,7 +334,7 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
       for (uint i = 0; i < numCallParameters; ++i) {
         TypesMgr::TypeId texpr = getTypeDecor(ctx->paramexp()->expr(i));
 
-        if (not Types.copyableTypes(funcParams[i], texpr))
+        if (not Types.isErrorTy(texpr) and not Types.copyableTypes(funcParams[i], texpr))
           Errors.incompatibleParameter(ctx->paramexp()->expr(i), i+1, ctx);
       }
     }
