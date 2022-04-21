@@ -117,6 +117,7 @@ antlrcpp::Any SymbolsVisitor::visitFunction(AslParser::FunctionContext *ctx) {
 
 antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx) {
   DEBUG_ENTER();
+  std::vector<TypesMgr::TypeId> lParamsTy;
   for (uint i = 0; i < ctx->ID().size(); ++i) {
     visit(ctx->type(i));
     std::string ident = ctx->ID(i)->getText();
@@ -126,10 +127,12 @@ antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx)
     else {
       TypesMgr::TypeId t = getTypeDecor(ctx->type(i));
       Symbols.addParameter(ident, t);
+      lParamsTy.push_back(t);
     }
   }
+
   DEBUG_EXIT();
-  return 0;
+  return lParamsTy;
 }
 
 antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ctx) {
@@ -283,6 +286,16 @@ antlrcpp::Any SymbolsVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
   DEBUG_EXIT();
   return r;
 }
+
+antlrcpp::Any SymbolsVisitor::visitParenthesis(AslParser::ParenthesisContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->expr());
+  TypesMgr::TypeId t = getTypeDecor(ctx->expr());
+  putTypeDecor(ctx, t);
+  DEBUG_EXIT();
+  return 0;
+}
+
 
 antlrcpp::Any SymbolsVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();

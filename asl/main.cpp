@@ -126,7 +126,7 @@ int main(int argc, const char* argv[]) {
 
   // ------------------------------------------------------------------
   // UNICAMENT PER DEBUGEJAR ELS ERRORS SEMANTICS, LEXICS I GRAMATICALS
-  return EXIT_SUCCESS;
+  // return EXIT_SUCCESS;
   // SI ES VOL COMPROVAR CODEGEN COMENTAR
   // ------------------------------------------------------------------
 

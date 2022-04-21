@@ -164,7 +164,7 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
     tlexpr = Types.getFuncReturnType(trexpr);
 
   if (not Types.isErrorTy(trexpr) and Types.isFunctionTy(trexpr))
-    trexpr = Types.getFuncReturnType(trexpr); 
+    trexpr = Types.getFuncReturnType(trexpr);
 
   if (not Types.isErrorTy(tlexpr) and not Types.isErrorTy(trexpr)){
     if (Types.isFunctionTy(tfrexpr) and Types.isVoidFunction(tfrexpr)
@@ -176,7 +176,7 @@ antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ct
           Errors.incompatibleAssignment(ctx->ASSIGN());
 
     }
-    
+
   }
 
   if ((not Types.isErrorTy(tlexpr)) and (not getIsLValueDecor(ctx->left_expr())))
@@ -314,6 +314,16 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   return 0;
 }
 
+antlrcpp::Any TypeCheckVisitor::visitParenthesis(AslParser::ParenthesisContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->expr());
+  TypesMgr::TypeId t = getTypeDecor(ctx->expr());
+  putTypeDecor(ctx, t);
+  DEBUG_EXIT();
+  return 0;
+}
+
+
 antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->ident());
@@ -347,6 +357,8 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_EXIT();
   return 0;
 }
+
+
 
 antlrcpp::Any TypeCheckVisitor::visitUnary(AslParser::UnaryContext *ctx) {
   DEBUG_ENTER();

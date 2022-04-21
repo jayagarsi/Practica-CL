@@ -127,6 +127,7 @@ ident   : ID
 
 ASSIGN    : '=' ;
 
+/*----Relacionals---*/
 EQUAL     : '==' ;
 NEQ       : '!=' ;
 LET       : '<';
@@ -134,16 +135,19 @@ LEQ       : '<=';
 GET       : '>';
 GEQ       : '>=';
 
+/*-----Logics----*/
 NOT       : 'not';
 AND       : 'and';
 OR        : 'or';
 
+/*----Aritmetics---*/
 PLUS      : '+' ;
 MINUS     : '-' ;
 MUL       : '*';
 DIV       : '/';
 MOD       : '%';
 
+/*------Tipus-------*/
 VAR       : 'var';
 INT       : 'int';
 FLOAT     : 'float';
@@ -151,26 +155,34 @@ CHAR      : 'char';
 BOOL      : 'bool';
 ARRAY     : 'array';
 
+/*------Condicional-----*/
 IF        : 'if' ;
 THEN      : 'then' ;
 ELSE      : 'else' ;
 ENDIF     : 'endif' ;
+
+/*------Bucle-----*/
 WHILE     : 'while';
 DO        : 'do';
 ENDWHILE  : 'endwhile';
+
+/*-----Funcions-----*/
 FUNC      : 'func' ;
 ENDFUNC   : 'endfunc' ;
 RETURN    : 'return';
 
+/*---Entrada/Sortida--*/
 READ      : 'read' ;
 WRITE     : 'write' ;
 
+/*-----Tipus basics-----*/
 BOOLVAL   : 'true' | 'false';
 ID        : ('a'..'z'|'A'..'Z') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')* ;
 INTVAL    : ('0'..'9')+ ;
 FLOATNUM  : ('0'..'9')+ '.' ('0'..'9')+;
 CHAREXPR  : '\'' ('a'..'z'|'A'..'Z') '\'';
 
+/*------Espais/Comentaris----- */
 
 // Strings (in quotes) with escape sequences
 STRING    : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ;
