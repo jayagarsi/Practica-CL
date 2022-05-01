@@ -272,12 +272,12 @@ antlrcpp::Any TypeCheckVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   visit(ctx->left_expr());
   TypesMgr::TypeId t1 = getTypeDecor(ctx->left_expr());
   if ((not Types.isErrorTy(t1)) and (not Types.isPrimitiveTy(t1)) and
-      (not Types.isFunctionTy(t1)) and (not (ctx->left_expr()->ident()->expr()))){
+      (not Types.isFunctionTy(t1)) and (not (ctx->left_expr()->expr()))){
     Errors.readWriteRequireBasic(ctx);
   }
 
   else if(not Types.isErrorTy(t1) and Types.isArrayTy(t1) and
-      (ctx->left_expr()->ident()->expr()) and not Types.isPrimitiveTy(Types.getArrayElemType(t1)))
+      (ctx->left_expr()->expr()) and not Types.isPrimitiveTy(Types.getArrayElemType(t1)))
       Errors.readWriteRequireBasic(ctx);
 
   if ((not Types.isErrorTy(t1)) and (not getIsLValueDecor(ctx->left_expr())))
@@ -307,6 +307,20 @@ antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx)
   DEBUG_ENTER();
   visit(ctx->ident());
   TypesMgr::TypeId t = getTypeDecor(ctx->ident());
+  if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
+    if (not Types.isErrorTy(t) and not Types.isArrayTy(t)) {
+      Errors.nonArrayInArrayAccess(ctx);
+      t = Types.createErrorTy();
+    }
+    visit(ctx->expr());
+    TypesMgr::TypeId taccess = getTypeDecor(ctx->expr());
+    if (not Types.isIntegerTy(taccess)) {                       // si l'acces no es de tipus enter error
+      Errors.nonIntegerIndexInArrayAccess(ctx->expr());
+
+    }
+    if (not Types.isErrorTy(t))
+      t = Types.getArrayElemType(t);
+  }
   bool b = getIsLValueDecor(ctx->ident());
   putTypeDecor(ctx, t);
   putIsLValueDecor(ctx, b);
@@ -358,6 +372,28 @@ antlrcpp::Any TypeCheckVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   return 0;
 }
 
+antlrcpp::Any TypeCheckVisitor::visitArrayAccess(AslParser::ArrayAccessContext *ctx) {
+  DEBUG_ENTER();
+  visit(ctx->ident());
+  visit(ctx->expr());
+  TypesMgr::TypeId t = getTypeDecor(ctx->ident());
+  if (not Types.isErrorTy(t) and not Types.isArrayTy(t)) {
+    Errors.nonArrayInArrayAccess(ctx);
+    t = Types.createErrorTy();
+  }
+  
+  TypesMgr::TypeId taccess = getTypeDecor(ctx->expr());
+  if (not Types.isIntegerTy(taccess)) {                       // si l'acces no es de tipus enter error
+    Errors.nonIntegerIndexInArrayAccess(ctx->expr());
+  }
+  if (not Types.isErrorTy(t))
+    t = Types.getArrayElemType(t);
+  bool b = getIsLValueDecor(ctx->ident());
+  putTypeDecor(ctx, t);
+  putIsLValueDecor(ctx, b);
+  DEBUG_EXIT();
+  return 0;
+}
 
 
 antlrcpp::Any TypeCheckVisitor::visitUnary(AslParser::UnaryContext *ctx) {
@@ -491,20 +527,6 @@ antlrcpp::Any TypeCheckVisitor::visitIdent(AslParser::IdentContext *ctx) {
   }
   else {                                                // altrament
     TypesMgr::TypeId ti = Symbols.getType(ident);
-    if (ctx->expr()) {                                // si te una expressio vol dir que es un acces a array
-      if (not Types.isArrayTy(ti)) {
-        Errors.nonArrayInArrayAccess(ctx);
-        ti = Types.createErrorTy();
-      }
-      visit(ctx->expr());
-      TypesMgr::TypeId taccess = getTypeDecor(ctx->expr());
-      if (not Types.isIntegerTy(taccess)) {                       // si l'acces no es de tipus enter error
-        Errors.nonIntegerIndexInArrayAccess(ctx->expr());
-
-      }
-      if (not Types.isErrorTy(ti))
-        ti = Types.getArrayElemType(ti);
-    }
     putTypeDecor(ctx, ti);
     if (Symbols.isFunctionClass(ident))
       putIsLValueDecor(ctx, false);

@@ -100,12 +100,13 @@ statement
 
 // Grammar for left expressions (l-values in C++)
 left_expr
-        : ident
+        : ident ('[' expr ']')?
         ;
 
 // Grammar for expressions with boolean, relational and aritmetic operators
 expr    : '(' expr ')'                                          # parenthesis
         | ident '(' paramexp ')'                                # funcCall
+        | ident '[' expr ']'                                    # arrayAccess
         | op=(NOT|PLUS|MINUS) expr                              # unary
         | expr op=(MUL|DIV|MOD) expr                            # arithmetic
         | expr op=(PLUS|MINUS) expr                             # arithmetic
@@ -118,7 +119,6 @@ expr    : '(' expr ')'                                          # parenthesis
 
 // Identifiers
 ident   : ID
-        | ID '[' expr ']'
         ;
 
 //////////////////////////////////////////////////
