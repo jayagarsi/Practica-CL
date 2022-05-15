@@ -522,8 +522,17 @@ antlrcpp::Any CodeGenVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx)
       code = code || instruction::MUL(temp, addr1, addr2);
     else if (ctx->DIV())
       code = code || instruction::DIV(temp, addr1, addr2);
-    //else if (ctx->MOD())
-    //  code = code || instruction::DIV(temp, addr1, addr2);
+    else if (ctx->MOD()) {
+      std::string temp2 = "%"+codeCounters.newTEMP();
+      std::string temp3 = "%"+codeCounters.newTEMP();
+      // a |_b
+      // r/  q          a = b*q + r
+      // r = a mod b == 
+      // r = a - q*b
+      code = code || instruction::DIV(temp2, addr1, addr2); // temp2 = q = a/b
+      code = code || instruction::MUL(temp3, temp2, addr2); // temp3 = q*b
+      code = code || instruction::SUB(temp,  addr1, temp3); // temp = r = a - q*b
+    }
     else if (ctx->PLUS())
       code = code || instruction::ADD(temp, addr1, addr2);
     else     // ctx->MINUS()
