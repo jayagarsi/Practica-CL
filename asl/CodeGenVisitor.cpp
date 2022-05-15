@@ -87,17 +87,17 @@ antlrcpp::Any CodeGenVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   codeCounters.reset();
   std::vector<var> && lvars = visit(ctx->declarations());
 
+  if (ctx->returnvalue()) {
+    TypesMgr::TypeId tret = getTypeDecor(ctx->returnvalue()->type());
+    setCurrentFunctionTy(tret);
+    subr.add_param("_result");
+  }
+
   if (ctx->parameters()) {
     std::vector<std::string> && lparams = visit(ctx->parameters());
     for (auto & oneParam : lparams) {
       subr.add_param(oneParam);
     }
-  }
-
-  if (ctx->returnvalue()) {
-        TypesMgr::TypeId tret = getTypeDecor(ctx->returnvalue()->type());
-        setCurrentFunctionTy(tret);
-        subr.add_param("_result");
   }
 
   for (auto & onevar : lvars) {
