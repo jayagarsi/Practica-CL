@@ -89,14 +89,15 @@ antlrcpp::Any CodeGenVisitor::visitFunction(AslParser::FunctionContext *ctx) {
 
   if (ctx->parameters()) {
     std::vector<std::string> && lparams = visit(ctx->parameters());
-    if (ctx->returnvalue()) {
-        TypesMgr::TypeId tret = getTypeDecor(ctx->returnvalue()->type());
-        setCurrentFunctionTy(tret);
-        subr.add_param("_result");
-    }
     for (auto & oneParam : lparams) {
       subr.add_param(oneParam);
     }
+  }
+
+  if (ctx->returnvalue()) {
+        TypesMgr::TypeId tret = getTypeDecor(ctx->returnvalue()->type());
+        setCurrentFunctionTy(tret);
+        subr.add_param("_result");
   }
 
   for (auto & onevar : lvars) {
@@ -470,11 +471,9 @@ antlrcpp::Any CodeGenVisitor::visitUnary(AslParser::UnaryContext *ctx) {
     else
       code = code || instruction::NEG(temp, addr);
   }
-  /*else {
-    std::string temp2 = "%" + codeCounters.newTEMP();
-    code = code || instruction::ILOAD(temp2, "0");
-    code = code || instruction::ADD(temp, addr, temp2);
-  }*/
+  else {
+    code = code || instruction::LOAD(temp, addr);
+  }
   CodeAttribs codAts(temp, "", code);
   DEBUG_EXIT();
   return codAts;
