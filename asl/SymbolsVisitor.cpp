@@ -134,7 +134,7 @@ antlrcpp::Any SymbolsVisitor::visitParameters(AslParser::ParametersContext *ctx)
   DEBUG_EXIT();
   return lParamsTy;
 }
-
+/*
 antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ctx) {
   DEBUG_ENTER();
   //antlrcpp::Any r = visitChildren(ctx);
@@ -142,14 +142,15 @@ antlrcpp::Any SymbolsVisitor::visitReturnvalue(AslParser::ReturnvalueContext *ct
   DEBUG_EXIT();
   return 0;
 }
-
+*/
+/*
 antlrcpp::Any SymbolsVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
 }
-
+*/
 antlrcpp::Any SymbolsVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
   DEBUG_ENTER();
   visit(ctx->type());
@@ -213,79 +214,86 @@ antlrcpp::Any SymbolsVisitor::visitType(AslParser::TypeContext *ctx) {
   DEBUG_EXIT();
   return t;
 }
-
+/*
 antlrcpp::Any SymbolsVisitor::visitParamexp(AslParser::ParamexpContext *ctx) {
   DEBUG_ENTER();
   for (auto & oneExpr : ctx->expr())
     visit(oneExpr);
   DEBUG_EXIT();
   return 0;
-}
+} */
 
-
+/*
 antlrcpp::Any SymbolsVisitor::visitStatements(AslParser::StatementsContext *ctx) {
   DEBUG_ENTER();
   for (auto & oneStmt : ctx->statement())
     visit(oneStmt);
   DEBUG_EXIT();
   return 0;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitIfStmt(AslParser::IfStmtContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitProcCall(AslParser::ProcCallContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitReadStmt(AslParser::ReadStmtContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitWriteExpr(AslParser::WriteExprContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitWriteString(AslParser::WriteStringContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
 }
-
+*/
+/*
 antlrcpp::Any SymbolsVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
-
+} */
+/*
 antlrcpp::Any SymbolsVisitor::visitExprIdent(AslParser::ExprIdentContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
 antlrcpp::Any SymbolsVisitor::visitParenthesis(AslParser::ParenthesisContext *ctx) {
   DEBUG_ENTER();
@@ -295,21 +303,21 @@ antlrcpp::Any SymbolsVisitor::visitParenthesis(AslParser::ParenthesisContext *ct
   DEBUG_EXIT();
   return 0;
 }
-
-
+/*
 antlrcpp::Any SymbolsVisitor::visitFuncCall(AslParser::FuncCallContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitArithmetic(AslParser::ArithmeticContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
 antlrcpp::Any SymbolsVisitor::visitRelational(AslParser::RelationalContext *ctx) {
   DEBUG_ENTER();
@@ -321,20 +329,21 @@ antlrcpp::Any SymbolsVisitor::visitRelational(AslParser::RelationalContext *ctx)
   return 0;
 }
 
+/*
 antlrcpp::Any SymbolsVisitor::visitValue(AslParser::ValueContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
+/*
 antlrcpp::Any SymbolsVisitor::visitIdent(AslParser::IdentContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
-
+} */
 
 // Getters for the necessary tree node atributes:
 //   Scope and Type

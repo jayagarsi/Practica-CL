@@ -100,55 +100,55 @@ antlrcpp::Any TypeCheckVisitor::visitFunction(AslParser::FunctionContext *ctx) {
   return 0;
 }
 
-antlrcpp::Any TypeCheckVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitDeclarations(AslParser::DeclarationsContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
-antlrcpp::Any TypeCheckVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitVariable_decl(AslParser::Variable_declContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
-antlrcpp::Any TypeCheckVisitor::visitType(AslParser::TypeContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitType(AslParser::TypeContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
-antlrcpp::Any TypeCheckVisitor::visitBasictype(AslParser::BasictypeContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitBasictype(AslParser::BasictypeContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
-antlrcpp::Any TypeCheckVisitor::visitArraytype(AslParser::ArraytypeContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitArraytype(AslParser::ArraytypeContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
-antlrcpp::Any TypeCheckVisitor::visitParamexp(AslParser::ParamexpContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitParamexp(AslParser::ParamexpContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
 
-antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitStatements(AslParser::StatementsContext *ctx) {
   DEBUG_ENTER();
   visitChildren(ctx);
   DEBUG_EXIT();
   return 0;
-}
+} */
 
 antlrcpp::Any TypeCheckVisitor::visitAssignStmt(AslParser::AssignStmtContext *ctx) {
   DEBUG_ENTER();
@@ -296,12 +296,12 @@ antlrcpp::Any TypeCheckVisitor::visitWriteExpr(AslParser::WriteExprContext *ctx)
   return 0;
 }
 
-antlrcpp::Any TypeCheckVisitor::visitWriteString(AslParser::WriteStringContext *ctx) {
+/* antlrcpp::Any TypeCheckVisitor::visitWriteString(AslParser::WriteStringContext *ctx) {
   DEBUG_ENTER();
   antlrcpp::Any r = visitChildren(ctx);
   DEBUG_EXIT();
   return r;
-}
+} */
 
 antlrcpp::Any TypeCheckVisitor::visitLeft_expr(AslParser::Left_exprContext *ctx) {
   DEBUG_ENTER();

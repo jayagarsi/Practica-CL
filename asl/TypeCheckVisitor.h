@@ -63,13 +63,13 @@ public:
   // Non visited nodes have been commented out:
   antlrcpp::Any visitProgram(AslParser::ProgramContext *ctx);
   antlrcpp::Any visitFunction(AslParser::FunctionContext *ctx);
-  antlrcpp::Any visitDeclarations(AslParser::DeclarationsContext *ctx);
-  antlrcpp::Any visitVariable_decl(AslParser::Variable_declContext *ctx);
-  antlrcpp::Any visitType(AslParser::TypeContext *ctx);
-  antlrcpp::Any visitBasictype(AslParser::BasictypeContext *ctx);
-  antlrcpp::Any visitArraytype(AslParser::ArraytypeContext *ctx);
-  antlrcpp::Any visitParamexp(AslParser::ParamexpContext *ctx);
-  antlrcpp::Any visitStatements(AslParser::StatementsContext *ctx);
+  // antlrcpp::Any visitDeclarations(AslParser::DeclarationsContext *ctx);
+  // antlrcpp::Any visitVariable_decl(AslParser::Variable_declContext *ctx);
+  // antlrcpp::Any visitType(AslParser::TypeContext *ctx);
+  // antlrcpp::Any visitBasictype(AslParser::BasictypeContext *ctx);
+  // antlrcpp::Any visitArraytype(AslParser::ArraytypeContext *ctx);
+  // antlrcpp::Any visitParamexp(AslParser::ParamexpContext *ctx);
+  // antlrcpp::Any visitStatements(AslParser::StatementsContext *ctx);
   antlrcpp::Any visitAssignStmt(AslParser::AssignStmtContext *ctx);
   antlrcpp::Any visitIfStmt(AslParser::IfStmtContext *ctx);
   antlrcpp::Any visitWhileStmt(AslParser::WhileStmtContext *ctx);
@@ -77,7 +77,7 @@ public:
   antlrcpp::Any visitReturnStmt(AslParser::ReturnStmtContext *ctx);
   antlrcpp::Any visitReadStmt(AslParser::ReadStmtContext *ctx);
   antlrcpp::Any visitWriteExpr(AslParser::WriteExprContext *ctx);
-  antlrcpp::Any visitWriteString(AslParser::WriteStringContext *ctx);
+  // antlrcpp::Any visitWriteString(AslParser::WriteStringContext *ctx);
   antlrcpp::Any visitLeft_expr(AslParser::Left_exprContext *ctx);
   antlrcpp::Any visitExprIdent(AslParser::ExprIdentContext *ctx);
   antlrcpp::Any visitParenthesis(AslParser::ParenthesisContext *ctx);
